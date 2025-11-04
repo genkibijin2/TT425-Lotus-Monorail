@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 namespace TT425_Lotus_Monorail
 {
@@ -9,6 +10,9 @@ namespace TT425_Lotus_Monorail
         //####
         String defaultDirectory = @"C:\sawfiles_test"; //default directory for .prt files, change to C:\sawfiles_two when live
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
+        int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
+        string[] prtFilesToBeWritten = new string[300]; //Array storing the names of files to be written
+        int numberOfFiles2BeWrittenGlobal = 0; //global storage for the number of files ready to be written to usb
         //####
 
         /*===BOOLEANS AND ERROR CHECKERS===*/
@@ -17,9 +21,10 @@ namespace TT425_Lotus_Monorail
         Boolean sawFolderExists = false; //Becomes true if the default directory exists.
         Boolean sawFolderFilesArePRT = false;   //Becomes true if there are .prt files in the saw files folder
         Boolean USBComparisonSuccessful = false; //becomes true if USB has been checked and there are files ready to write
-        Boolean readyToStartWriting = false; //Becomes true if it is okay to begin writing files
+        Boolean powerReady = false; //Becomes true if it is okay to begin writing files
         Boolean sawFileNotYetWritten = false;   //Becomes true if the saw file does not also exist on target removable drive
         Boolean extremeErrorState = false; //Becomes true if an exception is thrown that should stop the program from continuing
+        Boolean prtOnUSB = false; //becomes true if there are .prt files on the usb drive
         //#
 
 
@@ -65,17 +70,30 @@ namespace TT425_Lotus_Monorail
 
         private void RefreshButton_Click(object sender, EventArgs e)
         {
+            GoLabel.Visible = false;
+            PowerButton.Image = Properties.Resources.PowerIdle;
             checkRemovableDrives();
         }
 
         private void removableDrivesSelection_SelectedIndexChanged(object sender, EventArgs e)
         //If dropdown changed, only perform a check if there's removable drives accessible
         {
+            GoLabel.Visible = false;
+            PowerButton.Image = Properties.Resources.PowerIdle;
             CheckUSBProcess();
+        }
+        private void PowerButton_Click(object sender, EventArgs e)
+        {
+            if (powerReady)
+            {
+                convertFilesToUSB();
+            }
         }
 
         private void changeFolderLocation()
         {
+            GoLabel.Visible = false;
+            PowerButton.Image = Properties.Resources.PowerIdle;
             //Method for picking a file, cut and paste to whichever button you
             //end up using to select this...
             DialogResult location2StartResult = folderSelector.ShowDialog();
@@ -104,7 +122,9 @@ namespace TT425_Lotus_Monorail
                 }
                 string USBDriveToChangeTo = justTheDriveLetterPlease;
                 currentSelectedUSBDrive = USBDriveToChangeTo;
-                compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo);
+
+                //Comparison process jump
+                compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo, currentNumberOfPrtFilesDetectedInFolder);
 
             }
             else if (removableDrivesAvailable && !sawFolderFilesArePRT)
@@ -258,6 +278,8 @@ namespace TT425_Lotus_Monorail
 
         private void checkForPRTFiles(String directoryToScan)
         {
+            GoLabel.Visible = false;
+            PowerButton.Image = Properties.Resources.PowerIdle;
             printToLog($"Checking {directoryToScan} for .prt files...");
             string[] fileNames = Directory.GetFiles(directoryToScan, "*.prt", SearchOption.TopDirectoryOnly);
             if (fileNames.Length != 0)
@@ -270,6 +292,7 @@ namespace TT425_Lotus_Monorail
                     printToLog($"Found {fileName}");
                 }
                 statusLight.Image = Properties.Resources.FileCheckOk;
+                currentNumberOfPrtFilesDetectedInFolder = numberOfPRTFilesFound;
                 fileCheckerStatusText.Text = $"Found {numberOfPRTFilesFound} .prt files in folder";
                 sawFolderFilesArePRT = true;
             }
@@ -285,30 +308,223 @@ namespace TT425_Lotus_Monorail
             }
         }
 
-        private void compareFolderFilesToUSB(string locationToCheck, string USBToCheck)
+        private void compareFolderFilesToUSB(string locationToCheck, string USBToCheck, int numberOfPrtFilesInFolder)
         //This method is only reached when a USB is available and .prt files are found in the chosen folder
         //So, don't worry about not having access to drive names or folder paths - They are already checked
         {
             USBComparisonSuccessful = false; //RESET FLAG
             printToLog($"Comparing contents of {locationToCheck} to USB Drive {USBToCheck}");
 
+            //First, create a string array of .prt files in the original directory
+            string[] fileNames = Directory.GetFiles(locationToCheck, "*.prt", SearchOption.TopDirectoryOnly);
+            string[] listOfPrtFilesInFolder = new string[numberOfPrtFilesInFolder];
+            string[] listOfPrtFilesTruncated = new string[numberOfPrtFilesInFolder];
+            int numberOfPrtFilesOnUsb = 0; //Reset Count
+            int numberOfUSBFilesAlreadyWritten = 0; //Reset, but this also counts how many files don't need writing
+            if (fileNames.Length != 0)
+            //.prt detected, add to list
+            {
+                //Generate list of prt files in folder
+                for (int fileIndex = 0; fileIndex < numberOfPrtFilesInFolder; fileIndex++)
+                {
+                    listOfPrtFilesInFolder[fileIndex] = fileNames[fileIndex];
+                }
+
+                //Truncate list so that only filename and .prt remain
+                for (int fileIndex = 0; fileIndex < numberOfPrtFilesInFolder; fileIndex++)
+                {
+                    string locationToCheckWithPathSetProperly = locationToCheck + "\\";
+                    listOfPrtFilesTruncated[fileIndex] = listOfPrtFilesInFolder[fileIndex].Replace(locationToCheckWithPathSetProperly, "");
+                }
+
+            }
+            //NOW, check USB for .prts, change checklight to purple with status "USB and Folder In Sync" if list of .prts is the same as array in folder.
+            string[] USBFiles = Directory.GetFiles(USBToCheck, "*.prt", SearchOption.TopDirectoryOnly);
+
+            if (USBFiles.Length != 0)
+            //Files Found
+            {
+                foreach (string USBFileName in USBFiles)
+                {
+                    //Count number directly
+                    numberOfPrtFilesOnUsb++;
+                }
+            }
+            if (numberOfPrtFilesOnUsb > 0)
+            //CONTINUE IF PRT FILES FOUND ON USB
+            {
+                string[] listOfUSBPrtFiles = new string[numberOfPrtFilesOnUsb];
+                string[] listOfUSBPrtFilesTruncated = new string[numberOfPrtFilesOnUsb];
+                for (int fileIndex = 0; fileIndex < numberOfPrtFilesOnUsb; fileIndex++)
+                {
+                    //Add to array of names
+                    listOfUSBPrtFiles[fileIndex] = USBFiles[fileIndex];
+                }
+
+                //truncate list to just filenames
+                for (int fileIndex = 0; fileIndex < numberOfPrtFilesOnUsb; fileIndex++)
+                {
+                    string locationOnUSBSet = USBToCheck;
+                    listOfUSBPrtFilesTruncated[fileIndex] = listOfUSBPrtFiles[fileIndex].Replace(locationOnUSBSet, "");
+                }
+
+                //NOW, Compare the lists and create a new array of files that only exist on the sawFolder
+                int numberOfFiles2BeWritten = 0;
+                foreach (string SawFolderFile2Check in listOfPrtFilesTruncated) //loop through every file found in folder
+                {
+                    Boolean doesFileAlreadyExistOnUsb = false;
+
+                    foreach (string USBFile2CheckAgainst in listOfUSBPrtFilesTruncated) //Check against every USB file
+                    {
+                        if (SawFolderFile2Check == USBFile2CheckAgainst) //if sawFolder file being checked is the same as a usb file
+                        {
+                            doesFileAlreadyExistOnUsb = true;
+
+                        }
+                    }
 
 
+                    if (!doesFileAlreadyExistOnUsb) //if file is not on USB, add it to the array of files to be written
+                    {
+                        prtFilesToBeWritten[numberOfFiles2BeWritten] = SawFolderFile2Check;
+                        printToLog($"{prtFilesToBeWritten[numberOfFiles2BeWritten]} Not Found On USB!");
+                        numberOfFiles2BeWritten++;
 
-            //Put this flag change wherever the comparison is successful...
-            USBComparisonSuccessful = true;
+                    }
+
+
+                }
+                numberOfFiles2BeWrittenGlobal = numberOfFiles2BeWritten;
+                if (numberOfFiles2BeWritten == 0)
+                {
+                    USBStatusText.Text = $"PC and USB Files are in sync";
+                    printToLog($"Contents of {locationToCheck} are the same as {USBToCheck}");
+                    USBCheckLight.Image = Properties.Resources.FileCheckSync;
+                    GoLabel.Visible = false;
+                    PowerButton.Image = Properties.Resources.PowerIdle;
+                    powerReady = false;
+                }
+                if (numberOfFiles2BeWritten > 0)
+                {
+                    USBComparisonSuccessful = true;
+                }
+
+                //---------------------------------------------------------------------------------------//
+            }
+            else //IF NO USB FILES ARE FOUND ON THE USB
+            {
+                //All of the prt files should be truncated and added to the array
+                for (int fileWriterIndex = 0; fileWriterIndex < listOfPrtFilesTruncated.Length; fileWriterIndex++)
+                {
+                    prtFilesToBeWritten[fileWriterIndex] = listOfPrtFilesTruncated[fileWriterIndex];
+                }
+                printToLog($"No .prt files found on USB");
+                USBComparisonSuccessful = true;
+                numberOfFiles2BeWrittenGlobal = currentNumberOfPrtFilesDetectedInFolder;
+
+            }
+
             if (USBComparisonSuccessful)
             {
+                USBStatusText.Text = ($"Ready to write {numberOfFiles2BeWrittenGlobal} .prt files");
                 //SUCCESS STATE - WRAP WITH SUCCESS FLAG AFTER FINISHING
-                USBStatusText.Text = $"Ready To Write";
                 USBCheckLight.Image = Properties.Resources.FileCheckOk;
+
+                //WHEN RUN BUTTON ADDED, THIS CHANGES THE IMAGE TO AVAILABLE SO IT CAN BE CLICKED
+                powerReady = true;
+                GoLabel.Visible = true;
+                PowerButton.Image = Properties.Resources.PowerReady;
+
                 //-----------------------------------------------------------------------------------//
             }
         }
 
+        private void convertFilesToUSB()
+        //Files are now picked, convert all to modern .prt
+        {
+            PowerButton.Image = Properties.Resources.PowerActive;
+            printToLog($"Writing {numberOfFiles2BeWrittenGlobal} .prt files to {currentSelectedUSBDrive}");
+            for (int writerIndex = 0; writerIndex < numberOfFiles2BeWrittenGlobal; writerIndex++)
+            //Loop that goes through each file to be printed and sends it to the write function
+            {
+                string pathOfFile2BeWritten = (folderLocationBox.Text + "\\" + prtFilesToBeWritten[writerIndex]);
+                string fileName2print = prtFilesToBeWritten[writerIndex];
+                printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
+                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex+1));
+            }
+
+
+            //End of Write
+            PowerButton.Image = Properties.Resources.PowerIdle;
+        }
+
+        private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber)
+        {
+            //-------DEFAULTS AND INITIALISATION--------//
+            int selectedLineInPRTFile = 0;
+            int cuttingNo = fileNumber + 1;
+            string cuttingLength = "000h"; //Size: ___ (can be _h or _w)
+            string profileCode = "LANXXX"; //E.G. LAN106W, found on line 7 after AB^FD
+            string leftHead = "45 | 90"; //based on |-| style drawing, run method to return number based on character, found just before "Right"
+            String rightHead = leftHead; //These are copies of each other
+            const int amount = 1; //always 1
+            double height = 70.00; //Can query db to find out, but just leave at 70 for most part
+            string orderNumber = "J0024569"; //Taken from Job No, after No: and before ^FS (do a double split)
+            int poz = 1; //Not sure if matters, leave at 1.
+            int assembly = (fileNumber + 1); //same as cuttingNo, changes with file, but shouldnt matter too much.
+            //Ignore Trolley, Box axis, Gasket, Operation//
+            int dealer = 1234567; //Barcode
+
+
+            //------------------------------------------//
+            if (File.Exists(pathOfPCFile))
+            {
+                string[] contentsOfPrt = File.ReadAllLines(pathOfPCFile); //read each line into array called contentsOfPrt
+                foreach (string line in contentsOfPrt)
+                {
+                    //debug print
+                    //printToLog($"{line}");
+                }
+
+                //------------PART 1------------//
+                //------Get cutting length------//
+                var prtLine8Array = contentsOfPrt[7].Split(' ');
+                cuttingLength = prtLine8Array[1];
+                if((cuttingLength.Substring(0, 1) == @"|") || (cuttingLength.Substring(0, 1) == @"-") || 
+                    (cuttingLength.Substring(0, 1) == @"\") || (cuttingLength.Substring(0, 1) == @"/"))
+                {
+                    cuttingLength = "0"; //If cutting length is missing, hence the angle would be loaded instead
+                }
+                printToLog($"Cutting Length: {cuttingLength}");
+                //------------------------------//
 
 
 
+            } //End of loop that checks if file exists (safety loop)
+            else
+            {
+                printToLog($"File error? Can't find {pathOfPCFile}");
+                printToLog($"Please refresh USB drives!");
+            }
+        }
+
+
+        //NOTES:
+        /*
+         * When files are converted and written to the USB, make sure you run every method for checking folder and USB to rescan all values. 
+         * If everything was correct, then in theory the finished light will be the sync light as usbCheck, folder check etc will run and 
+         * determine that the contents of the folder is exactly the same as the USB.
+         * 
+         */
+
+        //POST-BETA UPGRADES:
+        /*
+         * Of course, basic USB functionality is all that's needed to push version 1, but after that I want to add many features, these include:
+         * !! Saved settings for defaults, networking location etc
+         * !! Network writing over ethernet
+         * !! Daemon-like functionality, click run and it will automatically keep moving files from the location to target area
+         * !! UI redesign
+         */
 
 
 
@@ -332,6 +548,24 @@ namespace TT425_Lotus_Monorail
         private void changeFolderIcon_MouseLeave(object sender, EventArgs e)
         {
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIcon;
+        }
+
+       
+
+        private void PowerButton_MouseEnter(object sender, EventArgs e)
+        {
+            if (powerReady)
+            {
+                PowerButton.Image = Properties.Resources.PowerReadyHover;
+            }
+        }
+
+        private void PowerButton_MouseLeave(object sender, EventArgs e)
+        {
+            if (powerReady)
+            {
+                PowerButton.Image = Properties.Resources.PowerReady;
+            }
         }
         //--------------------------------------------------------------------------------------------//
     }

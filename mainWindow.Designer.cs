@@ -39,10 +39,13 @@
             USBStatusText = new RichTextBox();
             RefreshButton = new PictureBox();
             changeFolderIcon = new PictureBox();
+            PowerButton = new PictureBox();
+            GoLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)PowerButton).BeginInit();
             SuspendLayout();
             // 
             // folderSelector
@@ -179,11 +182,38 @@
             changeFolderIcon.MouseEnter += changeFolderIcon_MouseEnter;
             changeFolderIcon.MouseLeave += changeFolderIcon_MouseLeave;
             // 
+            // PowerButton
+            // 
+            PowerButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            PowerButton.Image = Properties.Resources.PowerIdle;
+            PowerButton.Location = new Point(349, 186);
+            PowerButton.Name = "PowerButton";
+            PowerButton.Size = new Size(24, 24);
+            PowerButton.TabIndex = 12;
+            PowerButton.TabStop = false;
+            PowerButton.Click += PowerButton_Click;
+            PowerButton.MouseEnter += PowerButton_MouseEnter;
+            PowerButton.MouseLeave += PowerButton_MouseLeave;
+            // 
+            // GoLabel
+            // 
+            GoLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            GoLabel.AutoSize = true;
+            GoLabel.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            GoLabel.Location = new Point(200, 190);
+            GoLabel.Name = "GoLabel";
+            GoLabel.Size = new Size(143, 16);
+            GoLabel.TabIndex = 13;
+            GoLabel.Text = "Convert to TT-425";
+            GoLabel.Visible = false;
+            // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(408, 337);
+            Controls.Add(GoLabel);
+            Controls.Add(PowerButton);
             Controls.Add(changeFolderIcon);
             Controls.Add(RefreshButton);
             Controls.Add(USBStatusText);
@@ -205,6 +235,7 @@
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).EndInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).EndInit();
+            ((System.ComponentModel.ISupportInitialize)PowerButton).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -222,5 +253,7 @@
         private RichTextBox USBStatusText;
         private PictureBox RefreshButton;
         private PictureBox changeFolderIcon;
+        private PictureBox PowerButton;
+        private Label GoLabel;
     }
 }
