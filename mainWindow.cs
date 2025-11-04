@@ -450,7 +450,7 @@ namespace TT425_Lotus_Monorail
                 string pathOfFile2BeWritten = (folderLocationBox.Text + "\\" + prtFilesToBeWritten[writerIndex]);
                 string fileName2print = prtFilesToBeWritten[writerIndex];
                 printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
-                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex+1));
+                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex));
             }
 
 
@@ -485,6 +485,10 @@ namespace TT425_Lotus_Monorail
                     //debug print
                     //printToLog($"{line}");
                 }
+                //------------PART 1------------//
+                //---------cutting Number-------//
+                printToLog($"Cutting Number: {cuttingNo}");
+                //------------------------------//
 
                 //------------PART 1------------//
                 //------Get cutting length------//
