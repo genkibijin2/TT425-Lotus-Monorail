@@ -442,6 +442,8 @@ namespace TT425_Lotus_Monorail
         private void convertFilesToUSB()
         //Files are now picked, convert all to modern .prt
         {
+            
+            bool isMultiLinePrt = false; //check if more than one prt file for batch
             PowerButton.Image = Properties.Resources.PowerActive;
             printToLog($"Writing {numberOfFiles2BeWrittenGlobal} .prt files to {currentSelectedUSBDrive}");
             for (int writerIndex = 0; writerIndex < numberOfFiles2BeWrittenGlobal; writerIndex++)
@@ -450,30 +452,39 @@ namespace TT425_Lotus_Monorail
                 string pathOfFile2BeWritten = (folderLocationBox.Text + "\\" + prtFilesToBeWritten[writerIndex]);
                 string fileName2print = prtFilesToBeWritten[writerIndex];
                 printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
-                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex));
-            }
 
+                //multiLinePrt = isThisFileAlone(pathOfFile2BeWritten); //routine to check if this is multiple prt files in one batch
+
+                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex), isMultiLinePrt);
+                //Write files to temporary .csv files starting with "2congealB[batch number]_[numberoffiles2bewritten if its over 1]
+                
+            }
+            if (isMultiLinePrt)
+            {
+                //congealSameBatchFiles();
+                //in routine, split between ; symbols, then write the cutting number to be the count of files congealed
+            }
 
             //End of Write
             PowerButton.Image = Properties.Resources.PowerIdle;
         }
 
-        private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber)
+        private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber, bool isMultiLinePrt)
         {
             //-------DEFAULTS AND INITIALISATION--------//
             int selectedLineInPRTFile = 0;
-            int cuttingNo = fileNumber + 1;
-            string cuttingLength = "000h"; //Size: ___ (can be _h or _w)
+            int cuttingNo = 1;
+            string cuttingLength = "000.0"; //Size of cut to make
             string profileCode = "LANXXX"; //E.G. LAN106W, found on line 7 after AB^FD
             string leftHead = "45 | 90"; //based on |-| style drawing, run method to return number based on character, found just before "Right"
-            String rightHead = leftHead; //These are copies of each other
+            string rightHead = leftHead; //These are copies of each other
             const int amount = 1; //always 1
             double height = 70.00; //Can query db to find out, but just leave at 70 for most part
             string orderNumber = "J0024569"; //Taken from Job No, after No: and before ^FS (do a double split)
             int poz = 1; //Not sure if matters, leave at 1.
             int assembly = (fileNumber + 1); //same as cuttingNo, changes with file, but shouldnt matter too much.
             //Ignore Trolley, Box axis, Gasket, Operation//
-            int dealer = 1234567; //Barcode
+            string dealer = "1234567"; //Barcode
 
 
             //------------------------------------------//
@@ -490,7 +501,7 @@ namespace TT425_Lotus_Monorail
                 printToLog($"Cutting Number: {cuttingNo}");
                 //------------------------------//
 
-                //------------PART 1------------//
+                //------------PART 2------------//
                 //------Get cutting length------//
                 var prtLine8Array = contentsOfPrt[7].Split(' ');
                 cuttingLength = prtLine8Array[1];
@@ -499,9 +510,92 @@ namespace TT425_Lotus_Monorail
                 {
                     cuttingLength = "0"; //If cutting length is missing, hence the angle would be loaded instead
                 }
+                cuttingLength = cuttingLength.Substring(0, cuttingLength.Length - 1); //remove letter at the end
+                //Add .0 decimal if no decimal found
+                try
+                {
+                    //Tries to split the number at the decimal point and assign the post decimal data to a variable
+                    //If no decimal is in string, exception is thrown, which we catch and then assign a decimal of .0 in the catch statement
+                    var testForDecimal = cuttingLength.Split('.');
+                    string throwExceptionIfNoDecimal = testForDecimal[1];
+                }
+                catch (Exception ex)
+                {
+                    printToLog($"Length has no decimal, appending .0");
+                    cuttingLength = cuttingLength + ".0";
+
+                }
+          
                 printToLog($"Cutting Length: {cuttingLength}");
                 //------------------------------//
 
+                //------------PART 3------------//
+                //--------Get Profile Code------//
+                var prtLine7Array = contentsOfPrt[6].Split(' '); //Split line 7 by spaces
+                var line7part1FurtherSplit = prtLine7Array[0].Split("FD"); //Split the first section between before FD and after FD
+                profileCode = line7part1FurtherSplit[1]; //profile code is the piece after FD but before the space
+                printToLog($"Profile Code: {profileCode}");
+                //------------------------------//
+
+                //------------PART 4------------//
+                //--------Get Head Angles-------// 
+                var line8SplitAtAngleHyphen = contentsOfPrt[7].Split('-'); //split by hyphen
+                string leftCharacterIcon = 
+                line8SplitAtAngleHyphen[0].Substring(line8SplitAtAngleHyphen[0].Length - 2); //Grab two characters before hyphen (angle and space)
+                string rightCharacterIcon = 
+                line8SplitAtAngleHyphen[1].Substring(0, 2); //Grab two characters after hypen (space and right angle)
+                leftCharacterIcon = leftCharacterIcon.Trim(); //Remove space
+                rightCharacterIcon = rightCharacterIcon.Trim(); //Remove Space
+                //Find angle from symbol//
+                string leftSawAngle = findSawAngle(leftCharacterIcon);
+                string rightSawAngle = findSawAngle(rightCharacterIcon);
+                leftHead = $"{leftSawAngle}|{rightSawAngle}";
+                rightHead = leftHead;
+                printToLog($"Left Head: {leftCharacterIcon}-{rightCharacterIcon} -> {leftHead}");
+                printToLog($"Right Head: {leftCharacterIcon}-{rightCharacterIcon} -> {rightHead}");
+                //------------------------------//
+
+                //Print Constants:
+                printToLog($"Amount: {amount}");
+                printToLog($"Height: {height}");
+               
+
+                //------------PART 5------------//
+                //--------Get Job Number--------// 
+                var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
+                var prtLine5SplitMoreAtFs = prtLine5SplitAtNo[1].Split("^FS"); //further split between ^FS at end
+                orderNumber = prtLine5SplitMoreAtFs[0]; //Just before ^FS is job number
+                if(orderNumber == "") //If this is blank, print that there is none
+                {
+                    printToLog($"Job Number: None");
+                }
+                else
+                {
+                    printToLog($"Job Number: {orderNumber}");
+                }
+                //------------------------------//
+
+                //Print Constants:
+                printToLog($"Position: {poz}");
+                printToLog($"Assembly: {assembly}");
+
+                //------------PART 6----------------//
+                //--------Get Dealer/Barcode--------//
+                var prtLine4SplitAtName = contentsOfPrt[3].Split("Name: ");
+                var prtLine4SplitMoreAtFs = prtLine4SplitAtName[1].Split("^FS"); //same process as job number but for line 4
+                dealer = prtLine4SplitMoreAtFs[0];
+                printToLog($"Dealer: {dealer}");
+                //----------------------------------//
+
+                //-----------PART 7----------------//
+                //--------Writing to csv-----------//
+
+
+                //---------------------------------//
+                if (isMultiLinePrt)
+                {
+                    //append to start 2congealB
+                }
 
 
             } //End of loop that checks if file exists (safety loop)
@@ -512,6 +606,26 @@ namespace TT425_Lotus_Monorail
             }
         }
 
+        private string findSawAngle(string prtAngle)
+        //function to convert saw icon to actual angle, returns cutting angle
+        {
+            string angle2return = "90"; //default
+            if(prtAngle == @"\")
+            {
+                angle2return = "45";
+            }
+            else if(prtAngle == @"|")
+            {
+                angle2return = "90";
+            }
+            else if (prtAngle == @"/")
+            {
+                angle2return = "45";
+            }
+            else { angle2return = "90"; }
+
+            return angle2return;
+        }
 
         //NOTES:
         /*
