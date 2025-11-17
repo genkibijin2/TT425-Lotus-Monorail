@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 namespace TT425_Lotus_Monorail
 {
     public partial class mainWindow : Form
@@ -25,6 +28,7 @@ namespace TT425_Lotus_Monorail
         Boolean sawFileNotYetWritten = false;   //Becomes true if the saw file does not also exist on target removable drive
         Boolean extremeErrorState = false; //Becomes true if an exception is thrown that should stop the program from continuing
         Boolean prtOnUSB = false; //becomes true if there are .prt files on the usb drive
+        Boolean startupFolderCheck = true; //Starts true, turns false to indicate startup has ended and default folder should not be used
         //#
 
 
@@ -37,6 +41,7 @@ namespace TT425_Lotus_Monorail
             //Startup Processes
             printToLog("loaded!");
             folderLocationBox.Text = defaultDirectory;
+            folderSelector.SelectedPath = defaultDirectory;
 
             //Drive Check
             removableDrivesSelection.Items.Add("No USB Drives Found");
@@ -52,7 +57,7 @@ namespace TT425_Lotus_Monorail
                 checkForPRTFiles(defaultDirectory); //Check default directory for PRT Files
                 CheckUSBProcess();
             }
-
+            startupFolderCheck = false;
 
         }
         //###
@@ -72,6 +77,7 @@ namespace TT425_Lotus_Monorail
         {
             GoLabel.Visible = false;
             PowerButton.Image = Properties.Resources.PowerIdle;
+            checkForPRTFiles(folderLocationBox.Text);
             checkRemovableDrives();
         }
 
@@ -113,7 +119,7 @@ namespace TT425_Lotus_Monorail
             {
                 string justTheDriveLetterPlease = ""; //initialise string
                 string? selectedDriveFullName = ""; //initialise non null string
-                string chosenStartFolder = folderSelector.SelectedPath;
+                string chosenStartFolder = folderSelector.SelectedPath;  //
                 //Method here to grab Drive Letter From Selection
                 selectedDriveFullName = removableDrivesSelection.GetItemText(removableDrivesSelection.SelectedItem);
                 if (selectedDriveFullName != null)
@@ -124,8 +130,12 @@ namespace TT425_Lotus_Monorail
                 currentSelectedUSBDrive = USBDriveToChangeTo;
 
                 //Comparison process jump
-                compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo, currentNumberOfPrtFilesDetectedInFolder);
-
+               
+               
+                
+                
+                    compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo, currentNumberOfPrtFilesDetectedInFolder);
+                
             }
             else if (removableDrivesAvailable && !sawFolderFilesArePRT)
             //If USB detected but no .prt files in folder
@@ -141,6 +151,8 @@ namespace TT425_Lotus_Monorail
                 //CHANGE THIS to code to reset the PRT comparison box
             }
         }
+
+        
 
         private void printToLog(string text2Print)
         //Appends log text to the top of the log box
@@ -441,50 +453,144 @@ namespace TT425_Lotus_Monorail
 
         private void convertFilesToUSB()
         //Files are now picked, convert all to modern .prt
+        /*
+         * UPDATE: have since found out that all .prt files end in _1 if alone, so there is no point in checking for a blank
+         * file end. Therefore, all of this multifile checking etc is useless, simply congeal with nothing during
+         * the congeal process
+         */
         {
-            
-            bool isMultiLinePrt = false; //check if more than one prt file for batch
+            int numberOfFilesProcessed = 0;
+            bool isSecondFileInMultiLine = true;
+            bool isMultiLinePrt = true; //check if more than one prt file for batch
+            bool onlyFile2Process = false; //if there's only one file, no point checking if its multifile
             PowerButton.Image = Properties.Resources.PowerActive;
             printToLog($"Writing {numberOfFiles2BeWrittenGlobal} .prt files to {currentSelectedUSBDrive}");
             for (int writerIndex = 0; writerIndex < numberOfFiles2BeWrittenGlobal; writerIndex++)
             //Loop that goes through each file to be printed and sends it to the write function
             {
+                
+                numberOfFilesProcessed++;
                 string pathOfFile2BeWritten = (folderLocationBox.Text + "\\" + prtFilesToBeWritten[writerIndex]);
                 string fileName2print = prtFilesToBeWritten[writerIndex];
+                try
+                {
+                    string[] batchNumber1array = prtFilesToBeWritten[writerIndex].Split("_");
+                    string batchNumber1 = batchNumber1array[batchNumber1array.Length - 2];
+                    string[] batchNumber2array = prtFilesToBeWritten[writerIndex + 1].Split("_");
+                    string batchNumber2 = batchNumber2array[batchNumber1array.Length - 2];
+                    if (batchNumber1 != batchNumber2)
+                    {
+                        onlyFile2Process = false;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    onlyFile2Process = false;
+                }
                 printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
-
-                //multiLinePrt = isThisFileAlone(pathOfFile2BeWritten); //routine to check if this is multiple prt files in one batch
-
-                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex), isMultiLinePrt);
-                //Write files to temporary .csv files starting with "2congealB[batch number]_[numberoffiles2bewritten if its over 1]
                 
+                string USBPath2CheckForMultiLine = copyOverPrtFile(pathOfFile2BeWritten, currentSelectedUSBDrive, fileName2print);
+                if (!onlyFile2Process) //if more than 1 file
+                {
+                    isMultiLinePrt = moreThanOnePrtOfThisFileNameOnUsbOrNot(USBPath2CheckForMultiLine);
+                    try
+                    {
+                        isSecondFileInMultiLine = secondFileMultiCheck(prtFilesToBeWritten[writerIndex], prtFilesToBeWritten[writerIndex + 1]);
+                        printToLog($"File has identical file in next array space");
+                    }
+                    catch(Exception Ex)
+                    {
+                        printToLog($"No file in next line");
+                        isSecondFileInMultiLine = false;
+                    }
+                    //routine to check if this is multiple prt files in one batch
+                }
+                
+
+                //copy over prts first to check in a moment
+                prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex), isMultiLinePrt, isSecondFileInMultiLine, fileName2print);
+                //Write files to temporary .csv files starting with "2congealB[batch number]_[prtPartNumber] if multiLine
+
+                //Copy original .prt files for comparison with drive in future checks:
+                //need a routine to try and check for index behind, and compare filenames, throw exception if not and print "no file underneath this one"
             }
-            if (isMultiLinePrt)
-            {
-                //congealSameBatchFiles();
-                //in routine, split between ; symbols, then write the cutting number to be the count of files congealed
-            }
+           
+            //Files are now written as temporary congeal files, so now check if anything contains that initial name, split at the end (there is always a _1 file), and
+            //for each 2congealxxxx file, search for the whole string, if there's more than 1 result then add all of them to an array, cycle through the array starting at index 1
+            //and continue appending to index 0
+            //at the end of this, write to a new file with just the full list and delete the congeal files associated with original, then rerun check for more congeal files.
+
+            CongealSameBatchFiles(currentSelectedUSBDrive);
+            clearAllTempFiles(currentSelectedUSBDrive);
+            //in routine, split between ; symbols, then write the cutting number to be the count of files congealed
+            
 
             //End of Write
             PowerButton.Image = Properties.Resources.PowerIdle;
+            CheckUSBProcess();
+        }
+        private bool secondFileMultiCheck(string currentFile, string nextFileInArray)
+        /*This has ended up a little bit complicated, spaghetti and insane, but the idea here was to check if there were other files on the USB already
+         * with the same PRT file associated. The only problem is, I've sorted everything into a loop that should stay as a loop to help me out and
+         * function well, but only one prt is written to the usb per loop.
+         * This means that on the first file write, the USB files cannot return that there are duplicates of a prt, as there will always be just
+         * one file to check and no comparison to make.
+         * This means I have to check that the current file and the next one to be written are the same instead, which works through throwing an
+         * exception if its out of bounds and essentially ignoring it. If there is an exception (I.e. there's not a file after the first, which can only apply
+         * to the first file), it will just not raise this flag. The flag for this or for original multiline checkings will allow the congeal files to 
+         * start being written. It's extremely roundabout and complicated but this is the best way...
+         * 
+         */
+        {
+            string[] batch2Check = currentFile.Split("_");
+            string[] nextBatch2Check = nextFileInArray.Split("_");
+            if (batch2Check[0] == nextBatch2Check[0])
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber, bool isMultiLinePrt)
+        private bool moreThanOnePrtOfThisFileNameOnUsbOrNot(string USBPATH)
+        {
+            int howManyFilesFoundWithThisBatchNo = 0;
+            string[] batchNumberArray = USBPATH.Split("_");
+            string batchNumber = batchNumberArray[batchNumberArray.Length - 2];
+            batchNumber = batchNumber.Replace($"{currentSelectedUSBDrive}", "");
+            string[] fileNames = Directory.GetFiles(currentSelectedUSBDrive, $"*{batchNumber}*", SearchOption.TopDirectoryOnly);
+            if (fileNames.Length > 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false; //file is alone, and NOT multiPrt
+            }
+        }
+
+        private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber, bool isMultiLinePrt, bool isSecondFileMultiPart, string fileName)
         {
             //-------DEFAULTS AND INITIALISATION--------//
             int selectedLineInPRTFile = 0;
             int cuttingNo = 1;
+            string cuttingNoAsString = $"{cuttingNo}";
             string cuttingLength = "000.0"; //Size of cut to make
             string profileCode = "LANXXX"; //E.G. LAN106W, found on line 7 after AB^FD
             string leftHead = "45 | 90"; //based on |-| style drawing, run method to return number based on character, found just before "Right"
             string rightHead = leftHead; //These are copies of each other
-            const int amount = 1; //always 1
-            double height = 70.00; //Can query db to find out, but just leave at 70 for most part
+            const string amount = "1"; //always 1
+            string height = "60"; //Can query db to find out, but just leave at 70 for most part
             string orderNumber = "J0024569"; //Taken from Job No, after No: and before ^FS (do a double split)
-            int poz = 1; //Not sure if matters, leave at 1.
-            int assembly = (fileNumber + 1); //same as cuttingNo, changes with file, but shouldnt matter too much.
+            string poz = "1"; //Not sure if matters, leave at 1.
+            string assembly = ($"{fileNumber + 1}"); //same as cuttingNo, changes with file, but shouldnt matter too much.
             //Ignore Trolley, Box axis, Gasket, Operation//
             string dealer = "1234567"; //Barcode
+
+            //Array for compress into final .csv
+            string detailsAsOneLine = "";
 
 
             //------------------------------------------//
@@ -498,7 +604,7 @@ namespace TT425_Lotus_Monorail
                 }
                 //------------PART 1------------//
                 //---------cutting Number-------//
-                printToLog($"Cutting Number: {cuttingNo}");
+                printToLog($"Cutting Number: {cuttingNoAsString}");
                 //------------------------------//
 
                 //------------PART 2------------//
@@ -587,15 +693,40 @@ namespace TT425_Lotus_Monorail
                 printToLog($"Dealer: {dealer}");
                 //----------------------------------//
 
+                //SIZE CHECKS/COMPRESSIONS//
+                printToLog($"Checking sizes...");
+                cuttingNoAsString = isThisTooBig(cuttingNoAsString, 4, "Cutting Number");
+                cuttingLength = isThisTooBig(cuttingLength, 6, "Cutting Length");
+                profileCode = isThisTooBig(profileCode, 12, "Profile Code");
+                leftHead = isThisTooBig(leftHead, 5, "Left Head");
+                rightHead = isThisTooBig(rightHead, 5, "Right Head");
+                height = isThisTooBig(height, 3, "Height");
+                orderNumber = isThisTooBig(orderNumber, 10, "Order Number");
+                poz = isThisTooBig(poz, 3, "Position");
+                assembly = isThisTooBig(assembly, 1, "Assembly");
+                dealer = isThisTooBig(dealer, 21, "Dealer/Barcode");
+                printToLog($"Finished Checking");
+                //------------------------//
+
+
                 //-----------PART 7----------------//
                 //--------Writing to csv-----------//
-
-
-                //---------------------------------//
-                if (isMultiLinePrt)
-                {
-                    //append to start 2congealB
-                }
+                //Compile all information into one string line with ; seperating the values
+                detailsAsOneLine = ($"{cuttingNoAsString};{cuttingLength};{profileCode};{leftHead};{rightHead};{height};{orderNumber};{poz};{assembly}" +
+                                        $";;;;;;{dealer}");
+                string nameOfFile2Write = fileName;
+                nameOfFile2Write = nameOfFile2Write.Substring(0, nameOfFile2Write.Length - 4);
+                
+             
+                //---------------------------------//  
+                printToLog($"File is one part of a multi .prt batch");
+                //append to start 2congealB
+                nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
+                printToLog($"Generated temporary file {nameOfFile2Write}");
+              
+                string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
+                File.WriteAllText(fullWritePath, detailsAsOneLine);
+               
 
 
             } //End of loop that checks if file exists (safety loop)
@@ -604,6 +735,32 @@ namespace TT425_Lotus_Monorail
                 printToLog($"File error? Can't find {pathOfPCFile}");
                 printToLog($"Please refresh USB drives!");
             }
+        }
+
+        private string copyOverPrtFile(string originalPath, string USBDRIVE, string fileName)
+        {
+
+            string usbFilePath = ($"{USBDRIVE}{fileName}");
+            printToLog($"Copying {fileName} to {USBDRIVE}");
+            try
+            {
+                File.Copy(originalPath, usbFilePath);
+            }
+            catch(Exception ex)
+            {
+                printToLog($"Error copying {fileName}: {ex.Message}");
+            }
+            return usbFilePath;
+        }
+        private string isThisTooBig(string string2Check, int maximumLength, string variableType)
+        {
+            string shortenedString = string2Check; //default
+            if (string2Check.Length > maximumLength)
+            {
+                printToLog($"{variableType} is too long! Shortening to first {maximumLength} characters");
+                shortenedString = string2Check.Substring(0, (maximumLength - 1));
+            }
+            return shortenedString;
         }
 
         private string findSawAngle(string prtAngle)
@@ -627,6 +784,83 @@ namespace TT425_Lotus_Monorail
             return angle2return;
         }
 
+        private void CongealSameBatchFiles(string USBPATH)
+        //searches for 2congeal files and appends them to a root index
+        {
+            //---1, Generate Dynamic List of files that end in _1.csv---//
+            string[] CongealFiles = Directory.GetFiles(USBPATH, "2congealB*", SearchOption.TopDirectoryOnly); //create array of all 2congeal Files
+            var rootCongealFiles = new List<string> { };
+            foreach (string originalFileName in CongealFiles)
+            {
+                string[] fileNameSplitUp = originalFileName.Split("_");
+                if (fileNameSplitUp[fileNameSplitUp.Length - 1] == "1.csv")
+                {
+
+                    //Adds _1.csv file to a list of "root files"
+                    rootCongealFiles.Add($"{originalFileName}");
+                    printToLog($"Root File Found: {originalFileName}");
+                }
+                
+            }
+
+            //--2, for each root file - check if _2 exists, _3 (with counter) etc until end--//
+            //If they do exist, append into giant string//
+            
+
+            foreach (string rootFile in rootCongealFiles) { //Cycle each root file
+                //printToLog($"Reading contents of {rootFile}");
+                //Generate filename without the _1 at the end
+                string[] splitUpFileName = rootFile.Split("_1");
+                string fileNameWithoutEnding = splitUpFileName[0];
+
+                string fullCsvOutput = File.ReadAllText(rootFile); //append first line
+                int counterDefault = 2; //default search counter
+
+                while (File.Exists($"{fileNameWithoutEnding}_{counterDefault}.csv"))
+                {
+                    
+                    printToLog($"Congealing contents of {fileNameWithoutEnding}_{counterDefault}.csv");
+                    string contentsOfCongealSplit = File.ReadAllText($"{fileNameWithoutEnding}_{counterDefault}.csv");
+                    fullCsvOutput = ($"{fullCsvOutput}{Environment.NewLine}{contentsOfCongealSplit}");
+                    counterDefault++;
+                }
+
+                //Write Appended string to .csv
+                string[] fileNameWithCongealedRemovedSplit = fileNameWithoutEnding.Split("congealB");
+                string justRootNumber = fileNameWithCongealedRemovedSplit[1];
+
+                //Write to final file
+                printToLog($"Generating {justRootNumber}.csv");
+                string fullWritePath = ($"{USBPATH}{justRootNumber}.csv");
+                //Check if file already exists, and delete it if so in order to rebuild file from scratch
+                if (File.Exists(fullWritePath))
+                {
+                    printToLog($"{justRootNumber}.csv already exists - rewriting...");
+                    File.Delete(fullWritePath);
+                }
+                File.WriteAllText(fullWritePath, fullCsvOutput);
+                
+
+
+            }
+
+
+        }
+
+        private void clearAllTempFiles(string USBPATH)
+        //Find and delete and temporary congeal files
+        {
+            printToLog($"Clearing up congeal files on {USBPATH}");
+            string[] CongealFiles = Directory.GetFiles(USBPATH, "2congealB*", SearchOption.TopDirectoryOnly); //create array of all 2congeal Files
+            foreach(string file2Delete in CongealFiles)
+            {
+                if (File.Exists(file2Delete))
+                {
+                    File.Delete(file2Delete);
+                }
+            }
+        }
+
         //NOTES:
         /*
          * When files are converted and written to the USB, make sure you run every method for checking folder and USB to rescan all values. 
@@ -644,6 +878,18 @@ namespace TT425_Lotus_Monorail
          * !! UI redesign
          */
 
+        /*
+         * Why use congeal/temporary files?
+         * While the process of invoking temporary files is overall slower and more CPU intensive than just appending everything to one variable
+         * then writing the final output to one file, but it makes it easier for me to segment and parse each section of code.
+         * The conversion to .csv takes place in a loop that could be amended to combine into one giant string, but there's also the issue of checking
+         * which files contain extra parts or are standalone. Again, this could also be done in one loop, but to keep everything clean and
+         * easy to work with from my perspective, I'd much prefer to have everything converted, THEN begin the congeal process in a seperate
+         * function.
+         * This isn't optimized, but it does make it easier for me to mentally grasp. The amount of boolean flags/checks and loops I've included up to
+         * the point of conversion is a lot to keep track of in my head, and I'd rather sacrifice a little bit of speed to help me actually
+         * finish the program and keep track of it. The files are all relatively small so the IO speed suffering shouldn't be too great.
+         */
 
 
 
