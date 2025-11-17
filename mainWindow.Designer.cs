@@ -41,11 +41,13 @@
             changeFolderIcon = new PictureBox();
             PowerButton = new PictureBox();
             GoLabel = new Label();
+            pictureBox1 = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PowerButton).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // folderSelector
@@ -207,11 +209,23 @@
             GoLabel.Text = "Convert to TT-425";
             GoLabel.Visible = false;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = Properties.Resources.tamao;
+            pictureBox1.Location = new Point(12, 157);
+            pictureBox1.MaximumSize = new Size(171, 60);
+            pictureBox1.MinimumSize = new Size(171, 60);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(171, 60);
+            pictureBox1.TabIndex = 14;
+            pictureBox1.TabStop = false;
+            // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(408, 337);
+            Controls.Add(pictureBox1);
             Controls.Add(GoLabel);
             Controls.Add(PowerButton);
             Controls.Add(changeFolderIcon);
@@ -236,6 +250,7 @@
             ((System.ComponentModel.ISupportInitialize)RefreshButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)PowerButton).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -255,5 +270,6 @@
         private PictureBox changeFolderIcon;
         private PictureBox PowerButton;
         private Label GoLabel;
+        private PictureBox pictureBox1;
     }
 }
