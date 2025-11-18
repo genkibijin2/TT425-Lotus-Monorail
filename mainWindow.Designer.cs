@@ -243,6 +243,7 @@
             MaximumSize = new Size(416, 363);
             MinimumSize = new Size(416, 363);
             Name = "mainWindow";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Lotus Monorail";
             Click += mainWindow_Click;
             ((System.ComponentModel.ISupportInitialize)statusLight).EndInit();

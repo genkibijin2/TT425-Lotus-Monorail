@@ -14,7 +14,7 @@ namespace TT425_Lotus_Monorail
         String defaultDirectory = @"C:\sawfiles_test"; //default directory for .prt files, change to C:\sawfiles_two when live
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
-        string[] prtFilesToBeWritten = new string[300]; //Array storing the names of files to be written
+        string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
         int numberOfFiles2BeWrittenGlobal = 0; //global storage for the number of files ready to be written to usb
         //####
 
@@ -39,6 +39,7 @@ namespace TT425_Lotus_Monorail
             //Initialization/Runtime Commands
             InitializeComponent();
             //Startup Processes
+            
             printToLog("loaded!");
             folderLocationBox.Text = defaultDirectory;
             folderSelector.SelectedPath = defaultDirectory;
@@ -92,7 +93,12 @@ namespace TT425_Lotus_Monorail
         {
             if (powerReady)
             {
+                Point whereIsTheParentWindow = new Point();
+                whereIsTheParentWindow = this.Location;
+                loadingScreen pleaseWait = new loadingScreen(whereIsTheParentWindow);
+                pleaseWait.Show();
                 convertFilesToUSB();
+                pleaseWait.Close();
             }
         }
 
@@ -332,7 +338,7 @@ namespace TT425_Lotus_Monorail
             string[] listOfPrtFilesInFolder = new string[numberOfPrtFilesInFolder];
             string[] listOfPrtFilesTruncated = new string[numberOfPrtFilesInFolder];
             int numberOfPrtFilesOnUsb = 0; //Reset Count
-            int numberOfUSBFilesAlreadyWritten = 0; //Reset, but this also counts how many files don't need writing
+            
             if (fileNames.Length != 0)
             //.prt detected, add to list
             {
@@ -485,6 +491,7 @@ namespace TT425_Lotus_Monorail
                 }
                 catch(Exception ex)
                 {
+                    printToLog($"{ex.Message}");
                     onlyFile2Process = false;
                 }
                 printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
@@ -500,7 +507,7 @@ namespace TT425_Lotus_Monorail
                     }
                     catch(Exception Ex)
                     {
-                        printToLog($"No file in next line");
+                        printToLog($"No file in next line: {Ex.Message}");
                         isSecondFileInMultiLine = false;
                     }
                     //routine to check if this is multiple prt files in one batch
@@ -556,7 +563,6 @@ namespace TT425_Lotus_Monorail
 
         private bool moreThanOnePrtOfThisFileNameOnUsbOrNot(string USBPATH)
         {
-            int howManyFilesFoundWithThisBatchNo = 0;
             string[] batchNumberArray = USBPATH.Split("_");
             string batchNumber = batchNumberArray[batchNumberArray.Length - 2];
             batchNumber = batchNumber.Replace($"{currentSelectedUSBDrive}", "");
@@ -574,7 +580,6 @@ namespace TT425_Lotus_Monorail
         private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber, bool isMultiLinePrt, bool isSecondFileMultiPart, string fileName)
         {
             //-------DEFAULTS AND INITIALISATION--------//
-            int selectedLineInPRTFile = 0;
             int cuttingNo = 1;
             string cuttingNoAsString = $"{cuttingNo}";
             string cuttingLength = "000.0"; //Size of cut to make
@@ -627,6 +632,7 @@ namespace TT425_Lotus_Monorail
                 }
                 catch (Exception ex)
                 {
+                    printToLog($"{ex.Message}");
                     printToLog($"Length has no decimal, appending .0");
                     cuttingLength = cuttingLength + ".0";
 
@@ -913,8 +919,6 @@ namespace TT425_Lotus_Monorail
         {
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIcon;
         }
-
-       
 
         private void PowerButton_MouseEnter(object sender, EventArgs e)
         {

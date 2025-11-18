@@ -83,6 +83,26 @@ namespace TT425_Lotus_Monorail.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap converting {
+            get {
+                object obj = ResourceManager.GetObject("converting", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap converting1 {
+            get {
+                object obj = ResourceManager.GetObject("converting1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap FileCheckNG {
             get {
                 object obj = ResourceManager.GetObject("FileCheckNG", resourceCulture);
