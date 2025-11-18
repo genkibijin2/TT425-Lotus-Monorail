@@ -45,6 +45,7 @@
             Name = "loadingScreen";
             StartPosition = FormStartPosition.Manual;
             Text = "Form1";
+            UseWaitCursor = true;
             ResumeLayout(false);
         }
 

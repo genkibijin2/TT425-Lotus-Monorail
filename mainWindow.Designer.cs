@@ -63,7 +63,7 @@
             folderLocationBox.BorderStyle = BorderStyle.FixedSingle;
             folderLocationBox.Cursor = Cursors.Hand;
             folderLocationBox.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            folderLocationBox.Location = new Point(12, 26);
+            folderLocationBox.Location = new Point(11, 24);
             folderLocationBox.Margin = new Padding(9, 6, 9, 6);
             folderLocationBox.MaximumSize = new Size(378, 26);
             folderLocationBox.Name = "folderLocationBox";
@@ -80,7 +80,7 @@
             logBox.BorderStyle = BorderStyle.FixedSingle;
             logBox.Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             logBox.ForeColor = Color.MintCream;
-            logBox.Location = new Point(12, 216);
+            logBox.Location = new Point(11, 216);
             logBox.MaximumSize = new Size(378, 109);
             logBox.MinimumSize = new Size(378, 109);
             logBox.Name = "logBox";
@@ -96,7 +96,7 @@
             removableDrivesSelection.DropDownStyle = ComboBoxStyle.DropDownList;
             removableDrivesSelection.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             removableDrivesSelection.FormattingEnabled = true;
-            removableDrivesSelection.Location = new Point(12, 93);
+            removableDrivesSelection.Location = new Point(11, 90);
             removableDrivesSelection.MaximumSize = new Size(378, 0);
             removableDrivesSelection.MinimumSize = new Size(378, 0);
             removableDrivesSelection.Name = "removableDrivesSelection";
@@ -108,7 +108,7 @@
             // 
             statusLight.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             statusLight.Image = Properties.Resources.FileCheckNG;
-            statusLight.Location = new Point(12, 61);
+            statusLight.Location = new Point(11, 58);
             statusLight.Name = "statusLight";
             statusLight.Size = new Size(26, 26);
             statusLight.TabIndex = 6;
@@ -121,7 +121,7 @@
             fileCheckerStatusText.BorderStyle = BorderStyle.FixedSingle;
             fileCheckerStatusText.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileCheckerStatusText.ForeColor = Color.White;
-            fileCheckerStatusText.Location = new Point(43, 61);
+            fileCheckerStatusText.Location = new Point(43, 58);
             fileCheckerStatusText.Multiline = false;
             fileCheckerStatusText.Name = "fileCheckerStatusText";
             fileCheckerStatusText.ReadOnly = true;
@@ -135,7 +135,7 @@
             // 
             USBCheckLight.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             USBCheckLight.Image = Properties.Resources.FileCheckNG;
-            USBCheckLight.Location = new Point(12, 123);
+            USBCheckLight.Location = new Point(11, 124);
             USBCheckLight.Name = "USBCheckLight";
             USBCheckLight.Size = new Size(26, 26);
             USBCheckLight.TabIndex = 8;
@@ -162,7 +162,7 @@
             // 
             RefreshButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             RefreshButton.Image = Properties.Resources.RefreshUsbIcon;
-            RefreshButton.Location = new Point(349, 121);
+            RefreshButton.Location = new Point(351, 120);
             RefreshButton.Name = "RefreshButton";
             RefreshButton.Size = new Size(39, 30);
             RefreshButton.TabIndex = 10;
@@ -175,7 +175,7 @@
             // 
             changeFolderIcon.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIcon;
-            changeFolderIcon.Location = new Point(12, 6);
+            changeFolderIcon.Location = new Point(11, 3);
             changeFolderIcon.Name = "changeFolderIcon";
             changeFolderIcon.Size = new Size(25, 20);
             changeFolderIcon.TabIndex = 11;
@@ -188,7 +188,7 @@
             // 
             PowerButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             PowerButton.Image = Properties.Resources.PowerIdle;
-            PowerButton.Location = new Point(349, 186);
+            PowerButton.Location = new Point(366, 188);
             PowerButton.Name = "PowerButton";
             PowerButton.Size = new Size(24, 24);
             PowerButton.TabIndex = 12;
@@ -202,7 +202,7 @@
             GoLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             GoLabel.AutoSize = true;
             GoLabel.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            GoLabel.Location = new Point(200, 190);
+            GoLabel.Location = new Point(217, 193);
             GoLabel.Name = "GoLabel";
             GoLabel.Size = new Size(143, 16);
             GoLabel.TabIndex = 13;
@@ -212,7 +212,7 @@
             // pictureBox1
             // 
             pictureBox1.Image = Properties.Resources.tamao;
-            pictureBox1.Location = new Point(12, 157);
+            pictureBox1.Location = new Point(12, 156);
             pictureBox1.MaximumSize = new Size(171, 60);
             pictureBox1.MinimumSize = new Size(171, 60);
             pictureBox1.Name = "pictureBox1";
@@ -224,6 +224,7 @@
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.Lavender;
             ClientSize = new Size(408, 337);
             Controls.Add(pictureBox1);
             Controls.Add(GoLabel);
@@ -238,6 +239,7 @@
             Controls.Add(logBox);
             Controls.Add(folderLocationBox);
             Font = new Font("MS PMincho", 15.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ForeColor = SystemColors.ControlText;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5, 4, 5, 4);
             MaximumSize = new Size(416, 363);

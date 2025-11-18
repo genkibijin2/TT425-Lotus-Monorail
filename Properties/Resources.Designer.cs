@@ -103,6 +103,16 @@ namespace TT425_Lotus_Monorail.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ebback {
+            get {
+                object obj = ResourceManager.GetObject("ebback", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap FileCheckNG {
             get {
                 object obj = ResourceManager.GetObject("FileCheckNG", resourceCulture);
@@ -126,6 +136,16 @@ namespace TT425_Lotus_Monorail.Properties {
         internal static System.Drawing.Bitmap FileCheckSync {
             get {
                 object obj = ResourceManager.GetObject("FileCheckSync", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap floatback {
+            get {
+                object obj = ResourceManager.GetObject("floatback", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

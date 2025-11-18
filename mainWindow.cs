@@ -11,7 +11,7 @@ namespace TT425_Lotus_Monorail
     {
         /*===GLOBAL VARIABLES===*/
         //####
-        String defaultDirectory = @"C:\sawfiles_test"; //default directory for .prt files, change to C:\sawfiles_two when live
+        String defaultDirectory = @"C:\sawfiles_two"; //default directory for .prt files, change to C:\sawfiles_two when live
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
