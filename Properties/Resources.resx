@@ -145,11 +145,17 @@
   <data name="FileCheckSync" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\FileCheckSync.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PowerActive" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\PowerActive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="floatback1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\floatback.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="tamao" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\tamao.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PowerActive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\PowerActive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="floatback" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\floatback.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RefreshUsbIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\RefreshUsbIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -163,7 +169,7 @@
   <data name="converting1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\converting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="floatback" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\floatback.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="bg006" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\bg006.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -63,6 +63,16 @@ namespace TT425_Lotus_Monorail.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bg006 {
+            get {
+                object obj = ResourceManager.GetObject("bg006", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ChangeFolderIcon {
             get {
                 object obj = ResourceManager.GetObject("ChangeFolderIcon", resourceCulture);
@@ -146,6 +156,16 @@ namespace TT425_Lotus_Monorail.Properties {
         internal static System.Drawing.Bitmap floatback {
             get {
                 object obj = ResourceManager.GetObject("floatback", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap floatback1 {
+            get {
+                object obj = ResourceManager.GetObject("floatback1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

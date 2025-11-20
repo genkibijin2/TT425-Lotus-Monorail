@@ -15,8 +15,8 @@ namespace TT425_Lotus_Monorail
         public loadingScreen(Point whereToPutThisWindow)
         {
             InitializeComponent();
-            whereToPutThisWindow.X = (whereToPutThisWindow.X + 48);
-            whereToPutThisWindow.Y = (whereToPutThisWindow.Y + 147);
+            whereToPutThisWindow.X = (whereToPutThisWindow.X + 52);
+            whereToPutThisWindow.Y = (whereToPutThisWindow.Y + 151);
             this.Location = whereToPutThisWindow;
         }
     }

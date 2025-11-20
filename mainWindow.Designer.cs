@@ -42,12 +42,20 @@
             PowerButton = new PictureBox();
             GoLabel = new Label();
             pictureBox1 = new PictureBox();
+            exitToolStripMenuItem = new ToolStripMenuItem();
+            convertFilesTT425ToolStripMenuItem = new ToolStripMenuItem();
+            menuStrip1 = new MenuStrip();
+            convertToTT425ToolStripMenuItem = new ToolStripMenuItem();
+            refreshUSBToolStripMenuItem = new ToolStripMenuItem();
+            clearLogToolStripMenuItem = new ToolStripMenuItem();
+            helpToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PowerButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // folderSelector
@@ -59,11 +67,11 @@
             // 
             // folderLocationBox
             // 
-            folderLocationBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            folderLocationBox.Anchor = AnchorStyles.None;
             folderLocationBox.BorderStyle = BorderStyle.FixedSingle;
             folderLocationBox.Cursor = Cursors.Hand;
             folderLocationBox.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            folderLocationBox.Location = new Point(11, 24);
+            folderLocationBox.Location = new Point(10, 50);
             folderLocationBox.Margin = new Padding(9, 6, 9, 6);
             folderLocationBox.MaximumSize = new Size(378, 26);
             folderLocationBox.Name = "folderLocationBox";
@@ -75,12 +83,12 @@
             // 
             // logBox
             // 
-            logBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            logBox.Anchor = AnchorStyles.None;
             logBox.BackColor = Color.DarkSlateBlue;
             logBox.BorderStyle = BorderStyle.FixedSingle;
             logBox.Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             logBox.ForeColor = Color.MintCream;
-            logBox.Location = new Point(11, 216);
+            logBox.Location = new Point(10, 242);
             logBox.MaximumSize = new Size(378, 109);
             logBox.MinimumSize = new Size(378, 109);
             logBox.Name = "logBox";
@@ -92,11 +100,11 @@
             // 
             // removableDrivesSelection
             // 
-            removableDrivesSelection.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            removableDrivesSelection.Anchor = AnchorStyles.None;
             removableDrivesSelection.DropDownStyle = ComboBoxStyle.DropDownList;
             removableDrivesSelection.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             removableDrivesSelection.FormattingEnabled = true;
-            removableDrivesSelection.Location = new Point(11, 90);
+            removableDrivesSelection.Location = new Point(10, 116);
             removableDrivesSelection.MaximumSize = new Size(378, 0);
             removableDrivesSelection.MinimumSize = new Size(378, 0);
             removableDrivesSelection.Name = "removableDrivesSelection";
@@ -106,9 +114,9 @@
             // 
             // statusLight
             // 
-            statusLight.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            statusLight.Anchor = AnchorStyles.None;
             statusLight.Image = Properties.Resources.FileCheckNG;
-            statusLight.Location = new Point(11, 58);
+            statusLight.Location = new Point(10, 84);
             statusLight.Name = "statusLight";
             statusLight.Size = new Size(26, 26);
             statusLight.TabIndex = 6;
@@ -116,12 +124,12 @@
             // 
             // fileCheckerStatusText
             // 
-            fileCheckerStatusText.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            fileCheckerStatusText.Anchor = AnchorStyles.None;
             fileCheckerStatusText.BackColor = Color.Black;
             fileCheckerStatusText.BorderStyle = BorderStyle.FixedSingle;
             fileCheckerStatusText.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileCheckerStatusText.ForeColor = Color.White;
-            fileCheckerStatusText.Location = new Point(43, 58);
+            fileCheckerStatusText.Location = new Point(42, 84);
             fileCheckerStatusText.Multiline = false;
             fileCheckerStatusText.Name = "fileCheckerStatusText";
             fileCheckerStatusText.ReadOnly = true;
@@ -133,9 +141,9 @@
             // 
             // USBCheckLight
             // 
-            USBCheckLight.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            USBCheckLight.Anchor = AnchorStyles.None;
             USBCheckLight.Image = Properties.Resources.FileCheckNG;
-            USBCheckLight.Location = new Point(11, 124);
+            USBCheckLight.Location = new Point(10, 150);
             USBCheckLight.Name = "USBCheckLight";
             USBCheckLight.Size = new Size(26, 26);
             USBCheckLight.TabIndex = 8;
@@ -143,12 +151,12 @@
             // 
             // USBStatusText
             // 
-            USBStatusText.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            USBStatusText.Anchor = AnchorStyles.None;
             USBStatusText.BackColor = Color.Black;
             USBStatusText.BorderStyle = BorderStyle.FixedSingle;
             USBStatusText.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             USBStatusText.ForeColor = Color.White;
-            USBStatusText.Location = new Point(43, 124);
+            USBStatusText.Location = new Point(42, 150);
             USBStatusText.Multiline = false;
             USBStatusText.Name = "USBStatusText";
             USBStatusText.ReadOnly = true;
@@ -160,9 +168,9 @@
             // 
             // RefreshButton
             // 
-            RefreshButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            RefreshButton.Anchor = AnchorStyles.None;
             RefreshButton.Image = Properties.Resources.RefreshUsbIcon;
-            RefreshButton.Location = new Point(351, 120);
+            RefreshButton.Location = new Point(350, 146);
             RefreshButton.Name = "RefreshButton";
             RefreshButton.Size = new Size(39, 30);
             RefreshButton.TabIndex = 10;
@@ -173,9 +181,9 @@
             // 
             // changeFolderIcon
             // 
-            changeFolderIcon.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            changeFolderIcon.Anchor = AnchorStyles.None;
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIcon;
-            changeFolderIcon.Location = new Point(11, 3);
+            changeFolderIcon.Location = new Point(10, 29);
             changeFolderIcon.Name = "changeFolderIcon";
             changeFolderIcon.Size = new Size(25, 20);
             changeFolderIcon.TabIndex = 11;
@@ -186,9 +194,9 @@
             // 
             // PowerButton
             // 
-            PowerButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            PowerButton.Anchor = AnchorStyles.None;
             PowerButton.Image = Properties.Resources.PowerIdle;
-            PowerButton.Location = new Point(366, 188);
+            PowerButton.Location = new Point(365, 214);
             PowerButton.Name = "PowerButton";
             PowerButton.Size = new Size(24, 24);
             PowerButton.TabIndex = 12;
@@ -199,10 +207,11 @@
             // 
             // GoLabel
             // 
-            GoLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            GoLabel.Anchor = AnchorStyles.None;
             GoLabel.AutoSize = true;
             GoLabel.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            GoLabel.Location = new Point(217, 193);
+            GoLabel.ForeColor = SystemColors.ActiveCaptionText;
+            GoLabel.Location = new Point(216, 219);
             GoLabel.Name = "GoLabel";
             GoLabel.Size = new Size(143, 16);
             GoLabel.TabIndex = 13;
@@ -211,8 +220,9 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.tamao;
-            pictureBox1.Location = new Point(12, 156);
+            pictureBox1.Location = new Point(10, 182);
             pictureBox1.MaximumSize = new Size(171, 60);
             pictureBox1.MinimumSize = new Size(171, 60);
             pictureBox1.Name = "pictureBox1";
@@ -220,12 +230,72 @@
             pictureBox1.TabIndex = 14;
             pictureBox1.TabStop = false;
             // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.ForeColor = Color.White;
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(51, 20);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // convertFilesTT425ToolStripMenuItem
+            // 
+            convertFilesTT425ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { convertToTT425ToolStripMenuItem, refreshUSBToolStripMenuItem, clearLogToolStripMenuItem });
+            convertFilesTT425ToolStripMenuItem.ForeColor = Color.White;
+            convertFilesTT425ToolStripMenuItem.Name = "convertFilesTT425ToolStripMenuItem";
+            convertFilesTT425ToolStripMenuItem.Size = new Size(51, 20);
+            convertFilesTT425ToolStripMenuItem.Text = "File";
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.BackgroundImage = Properties.Resources.bg006;
+            menuStrip1.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { exitToolStripMenuItem, convertFilesTT425ToolStripMenuItem, helpToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.RightToLeft = RightToLeft.Yes;
+            menuStrip1.Size = new Size(398, 24);
+            menuStrip1.TabIndex = 15;
+            menuStrip1.Text = "menuStrip1";
+            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
+            menuStrip1.MouseDown += menuStrip1_MouseDown;
+            menuStrip1.MouseMove += menuStrip1_MouseMove;
+            menuStrip1.MouseUp += menuStrip1_MouseUp;
+            // 
+            // convertToTT425ToolStripMenuItem
+            // 
+            convertToTT425ToolStripMenuItem.Name = "convertToTT425ToolStripMenuItem";
+            convertToTT425ToolStripMenuItem.Size = new Size(202, 22);
+            convertToTT425ToolStripMenuItem.Text = "Convert To TT425";
+            convertToTT425ToolStripMenuItem.Click += convertToTT425ToolStripMenuItem_Click;
+            // 
+            // refreshUSBToolStripMenuItem
+            // 
+            refreshUSBToolStripMenuItem.Name = "refreshUSBToolStripMenuItem";
+            refreshUSBToolStripMenuItem.Size = new Size(202, 22);
+            refreshUSBToolStripMenuItem.Text = "Refresh USB";
+            refreshUSBToolStripMenuItem.Click += refreshUSBToolStripMenuItem_Click;
+            // 
+            // clearLogToolStripMenuItem
+            // 
+            clearLogToolStripMenuItem.Name = "clearLogToolStripMenuItem";
+            clearLogToolStripMenuItem.Size = new Size(202, 22);
+            clearLogToolStripMenuItem.Text = "Clear Log";
+            clearLogToolStripMenuItem.Click += clearLogToolStripMenuItem_Click;
+            // 
+            // helpToolStripMenuItem
+            // 
+            helpToolStripMenuItem.ForeColor = Color.White;
+            helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            helpToolStripMenuItem.Size = new Size(51, 20);
+            helpToolStripMenuItem.Text = "Help";
+            // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Lavender;
-            ClientSize = new Size(408, 337);
+            ClientSize = new Size(398, 363);
             Controls.Add(pictureBox1);
             Controls.Add(GoLabel);
             Controls.Add(PowerButton);
@@ -238,22 +308,27 @@
             Controls.Add(removableDrivesSelection);
             Controls.Add(logBox);
             Controls.Add(folderLocationBox);
+            Controls.Add(menuStrip1);
             Font = new Font("MS PMincho", 15.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            ForeColor = SystemColors.ControlText;
+            ForeColor = SystemColors.ButtonHighlight;
+            FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5, 4, 5, 4);
-            MaximumSize = new Size(416, 363);
-            MinimumSize = new Size(416, 363);
             Name = "mainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Lotus Monorail";
             Click += mainWindow_Click;
+            MouseDown += mainWindow_MouseDown;
+            MouseMove += mainWindow_MouseMove;
+            MouseUp += mainWindow_MouseUp;
             ((System.ComponentModel.ISupportInitialize)statusLight).EndInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).EndInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)changeFolderIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)PowerButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -274,5 +349,12 @@
         private PictureBox PowerButton;
         private Label GoLabel;
         private PictureBox pictureBox1;
+        private ToolStripMenuItem exitToolStripMenuItem;
+        private ToolStripMenuItem convertFilesTT425ToolStripMenuItem;
+        private ToolStripMenuItem convertToTT425ToolStripMenuItem;
+        private ToolStripMenuItem refreshUSBToolStripMenuItem;
+        private ToolStripMenuItem clearLogToolStripMenuItem;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem helpToolStripMenuItem;
     }
 }

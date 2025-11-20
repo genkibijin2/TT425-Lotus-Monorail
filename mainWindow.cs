@@ -39,7 +39,7 @@ namespace TT425_Lotus_Monorail
             //Initialization/Runtime Commands
             InitializeComponent();
             //Startup Processes
-            
+
             printToLog("loaded!");
             folderLocationBox.Text = defaultDirectory;
             folderSelector.SelectedPath = defaultDirectory;
@@ -101,6 +101,39 @@ namespace TT425_Lotus_Monorail
                 pleaseWait.Close();
             }
         }
+        private void convertToTT425ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (powerReady)
+            {
+                Point whereIsTheParentWindow = new Point();
+                whereIsTheParentWindow = this.Location;
+                loadingScreen pleaseWait = new loadingScreen(whereIsTheParentWindow);
+                pleaseWait.Show();
+                convertFilesToUSB();
+                pleaseWait.Close();
+            }
+            else
+            {
+                printToLog("Couldn't convert: USB not prepped");
+            }
+        }
+
+        private void refreshUSBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GoLabel.Visible = false;
+            PowerButton.Image = Properties.Resources.PowerIdle;
+            checkForPRTFiles(folderLocationBox.Text);
+            checkRemovableDrives();
+        }
+
+        private void clearLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DateTime currentDate = DateTime.Now;
+            String justTheTime = currentDate.ToString("HH:mm:ss");
+            //Check Size of log, will wipe when very very long
+
+            logBox.Text = ("[" + justTheTime + "]" + " Log cleared");
+        }
 
         private void changeFolderLocation()
         {
@@ -136,12 +169,12 @@ namespace TT425_Lotus_Monorail
                 currentSelectedUSBDrive = USBDriveToChangeTo;
 
                 //Comparison process jump
-               
-               
-                
-                
-                    compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo, currentNumberOfPrtFilesDetectedInFolder);
-                
+
+
+
+
+                compareFolderFilesToUSB(chosenStartFolder, USBDriveToChangeTo, currentNumberOfPrtFilesDetectedInFolder);
+
             }
             else if (removableDrivesAvailable && !sawFolderFilesArePRT)
             //If USB detected but no .prt files in folder
@@ -158,7 +191,7 @@ namespace TT425_Lotus_Monorail
             }
         }
 
-        
+
 
         private void printToLog(string text2Print)
         //Appends log text to the top of the log box
@@ -338,7 +371,7 @@ namespace TT425_Lotus_Monorail
             string[] listOfPrtFilesInFolder = new string[numberOfPrtFilesInFolder];
             string[] listOfPrtFilesTruncated = new string[numberOfPrtFilesInFolder];
             int numberOfPrtFilesOnUsb = 0; //Reset Count
-            
+
             if (fileNames.Length != 0)
             //.prt detected, add to list
             {
@@ -474,7 +507,7 @@ namespace TT425_Lotus_Monorail
             for (int writerIndex = 0; writerIndex < numberOfFiles2BeWrittenGlobal; writerIndex++)
             //Loop that goes through each file to be printed and sends it to the write function
             {
-                
+
                 numberOfFilesProcessed++;
                 string pathOfFile2BeWritten = (folderLocationBox.Text + "\\" + prtFilesToBeWritten[writerIndex]);
                 string fileName2print = prtFilesToBeWritten[writerIndex];
@@ -489,13 +522,13 @@ namespace TT425_Lotus_Monorail
                         onlyFile2Process = false;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     printToLog($"{ex.Message}");
                     onlyFile2Process = false;
                 }
                 printToLog($"Writing file {fileName2print} to {currentSelectedUSBDrive}");
-                
+
                 string USBPath2CheckForMultiLine = copyOverPrtFile(pathOfFile2BeWritten, currentSelectedUSBDrive, fileName2print);
                 if (!onlyFile2Process) //if more than 1 file
                 {
@@ -505,14 +538,14 @@ namespace TT425_Lotus_Monorail
                         isSecondFileInMultiLine = secondFileMultiCheck(prtFilesToBeWritten[writerIndex], prtFilesToBeWritten[writerIndex + 1]);
                         printToLog($"File has identical file in next array space");
                     }
-                    catch(Exception Ex)
+                    catch (Exception Ex)
                     {
                         printToLog($"No file in next line: {Ex.Message}");
                         isSecondFileInMultiLine = false;
                     }
                     //routine to check if this is multiple prt files in one batch
                 }
-                
+
 
                 //copy over prts first to check in a moment
                 prtTo425CSV(pathOfFile2BeWritten, currentSelectedUSBDrive, (writerIndex), isMultiLinePrt, isSecondFileInMultiLine, fileName2print);
@@ -521,7 +554,7 @@ namespace TT425_Lotus_Monorail
                 //Copy original .prt files for comparison with drive in future checks:
                 //need a routine to try and check for index behind, and compare filenames, throw exception if not and print "no file underneath this one"
             }
-           
+
             //Files are now written as temporary congeal files, so now check if anything contains that initial name, split at the end (there is always a _1 file), and
             //for each 2congealxxxx file, search for the whole string, if there's more than 1 result then add all of them to an array, cycle through the array starting at index 1
             //and continue appending to index 0
@@ -530,7 +563,7 @@ namespace TT425_Lotus_Monorail
             CongealSameBatchFiles(currentSelectedUSBDrive);
             clearAllTempFiles(currentSelectedUSBDrive);
             //in routine, split between ; symbols, then write the cutting number to be the count of files congealed
-            
+
 
             //End of Write
             PowerButton.Image = Properties.Resources.PowerIdle;
@@ -616,7 +649,7 @@ namespace TT425_Lotus_Monorail
                 //------Get cutting length------//
                 var prtLine8Array = contentsOfPrt[7].Split(' ');
                 cuttingLength = prtLine8Array[1];
-                if((cuttingLength.Substring(0, 1) == @"|") || (cuttingLength.Substring(0, 1) == @"-") || 
+                if ((cuttingLength.Substring(0, 1) == @"|") || (cuttingLength.Substring(0, 1) == @"-") ||
                     (cuttingLength.Substring(0, 1) == @"\") || (cuttingLength.Substring(0, 1) == @"/"))
                 {
                     cuttingLength = "0"; //If cutting length is missing, hence the angle would be loaded instead
@@ -637,7 +670,7 @@ namespace TT425_Lotus_Monorail
                     cuttingLength = cuttingLength + ".0";
 
                 }
-          
+
                 printToLog($"Cutting Length: {cuttingLength}");
                 //------------------------------//
 
@@ -652,9 +685,9 @@ namespace TT425_Lotus_Monorail
                 //------------PART 4------------//
                 //--------Get Head Angles-------// 
                 var line8SplitAtAngleHyphen = contentsOfPrt[7].Split('-'); //split by hyphen
-                string leftCharacterIcon = 
+                string leftCharacterIcon =
                 line8SplitAtAngleHyphen[0].Substring(line8SplitAtAngleHyphen[0].Length - 2); //Grab two characters before hyphen (angle and space)
-                string rightCharacterIcon = 
+                string rightCharacterIcon =
                 line8SplitAtAngleHyphen[1].Substring(0, 2); //Grab two characters after hypen (space and right angle)
                 leftCharacterIcon = leftCharacterIcon.Trim(); //Remove space
                 rightCharacterIcon = rightCharacterIcon.Trim(); //Remove Space
@@ -670,14 +703,14 @@ namespace TT425_Lotus_Monorail
                 //Print Constants:
                 printToLog($"Amount: {amount}");
                 printToLog($"Height: {height}");
-               
+
 
                 //------------PART 5------------//
                 //--------Get Job Number--------// 
                 var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
                 var prtLine5SplitMoreAtFs = prtLine5SplitAtNo[1].Split("^FS"); //further split between ^FS at end
                 orderNumber = prtLine5SplitMoreAtFs[0]; //Just before ^FS is job number
-                if(orderNumber == "") //If this is blank, print that there is none
+                if (orderNumber == "") //If this is blank, print that there is none
                 {
                     printToLog($"Job Number: None");
                 }
@@ -722,17 +755,17 @@ namespace TT425_Lotus_Monorail
                                         $";;;;;;{dealer}");
                 string nameOfFile2Write = fileName;
                 nameOfFile2Write = nameOfFile2Write.Substring(0, nameOfFile2Write.Length - 4);
-                
-             
+
+
                 //---------------------------------//  
                 printToLog($"File is one part of a multi .prt batch");
                 //append to start 2congealB
                 nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
                 printToLog($"Generated temporary file {nameOfFile2Write}");
-              
+
                 string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
                 File.WriteAllText(fullWritePath, detailsAsOneLine);
-               
+
 
 
             } //End of loop that checks if file exists (safety loop)
@@ -752,7 +785,7 @@ namespace TT425_Lotus_Monorail
             {
                 File.Copy(originalPath, usbFilePath);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 printToLog($"Error copying {fileName}: {ex.Message}");
             }
@@ -773,11 +806,11 @@ namespace TT425_Lotus_Monorail
         //function to convert saw icon to actual angle, returns cutting angle
         {
             string angle2return = "90"; //default
-            if(prtAngle == @"\")
+            if (prtAngle == @"\")
             {
                 angle2return = "45";
             }
-            else if(prtAngle == @"|")
+            else if (prtAngle == @"|")
             {
                 angle2return = "90";
             }
@@ -806,14 +839,15 @@ namespace TT425_Lotus_Monorail
                     rootCongealFiles.Add($"{originalFileName}");
                     printToLog($"Root File Found: {originalFileName}");
                 }
-                
+
             }
 
             //--2, for each root file - check if _2 exists, _3 (with counter) etc until end--//
             //If they do exist, append into giant string//
-            
 
-            foreach (string rootFile in rootCongealFiles) { //Cycle each root file
+
+            foreach (string rootFile in rootCongealFiles)
+            { //Cycle each root file
                 //printToLog($"Reading contents of {rootFile}");
                 //Generate filename without the _1 at the end
                 string[] splitUpFileName = rootFile.Split("_1");
@@ -824,7 +858,7 @@ namespace TT425_Lotus_Monorail
 
                 while (File.Exists($"{fileNameWithoutEnding}_{counterDefault}.csv"))
                 {
-                    
+
                     printToLog($"Congealing contents of {fileNameWithoutEnding}_{counterDefault}.csv");
                     string contentsOfCongealSplit = File.ReadAllText($"{fileNameWithoutEnding}_{counterDefault}.csv");
                     fullCsvOutput = ($"{fullCsvOutput}{Environment.NewLine}{contentsOfCongealSplit}");
@@ -845,7 +879,7 @@ namespace TT425_Lotus_Monorail
                     File.Delete(fullWritePath);
                 }
                 File.WriteAllText(fullWritePath, fullCsvOutput);
-                
+
 
 
             }
@@ -858,7 +892,7 @@ namespace TT425_Lotus_Monorail
         {
             printToLog($"Clearing up congeal files on {USBPATH}");
             string[] CongealFiles = Directory.GetFiles(USBPATH, "2congealB*", SearchOption.TopDirectoryOnly); //create array of all 2congeal Files
-            foreach(string file2Delete in CongealFiles)
+            foreach (string file2Delete in CongealFiles)
             {
                 if (File.Exists(file2Delete))
                 {
@@ -935,6 +969,58 @@ namespace TT425_Lotus_Monorail
                 PowerButton.Image = Properties.Resources.PowerReady;
             }
         }
+        //---Code that manages clicking and dragging the window despite not having actual OS borders---\\
+        private bool mouseDown;
+        private bool mouseDownOnHeader;
+        private Point lastLocation;
+        private void mainWindow_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseDown = true;
+            lastLocation = e.Location;
+        }
+
+        private void mainWindow_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown)
+            {
+                this.Location = new Point(
+                    (this.Location.X - lastLocation.X) + e.X, (this.Location.Y - lastLocation.Y) + e.Y);
+
+                this.Update();
+            }
+        }
+
+        private void mainWindow_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void menuStrip1_MouseDown(object sender, MouseEventArgs e)
+        {
+           
+        }
+
+        private void menuStrip1_MouseMove(object sender, MouseEventArgs e)
+        {
+           
+        }
+
+        private void menuStrip1_MouseUp(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+      
         //--------------------------------------------------------------------------------------------//
     }
 }
