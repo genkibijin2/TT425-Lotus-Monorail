@@ -613,6 +613,12 @@ namespace TT425_Lotus_Monorail
         private void prtTo425CSV(string pathOfPCFile, string targetUSB, int fileNumber, bool isMultiLinePrt, bool isSecondFileMultiPart, string fileName)
         {
             //-------DEFAULTS AND INITIALISATION--------//
+
+            //xxxxxxxxxxxxxxxxxxxxxxxxPATCH 2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\
+            bool bayCillDetected = false; //Flag if bay cill (two widths), dont write if flag activated
+            //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\
+
+
             int cuttingNo = 1;
             string cuttingNoAsString = $"{cuttingNo}";
             string cuttingLength = "000.0"; //Size of cut to make
@@ -654,6 +660,14 @@ namespace TT425_Lotus_Monorail
                 {
                     cuttingLength = "0"; //If cutting length is missing, hence the angle would be loaded instead
                 }
+                if (cuttingLength.Substring(cuttingLength.Length-1, 1) == ",")
+                {
+                    printToLog($"{pathOfPCFile} has multiple angles and may be a bay cill. This line will be written blank!");
+                    MessageBox.Show($"{pathOfPCFile} has multiple angles and may be a bay cill. This line will be written blank!");
+                    bayCillDetected = true;
+                }
+                
+
                 cuttingLength = cuttingLength.Substring(0, cuttingLength.Length - 1); //remove letter at the end
                 //Add .0 decimal if no decimal found
                 try
@@ -684,30 +698,41 @@ namespace TT425_Lotus_Monorail
 
                 //------------PART 4------------//
                 //--------Get Head Angles-------// 
-                var line8SplitAtAngleHyphen = contentsOfPrt[7].Split('-'); //split by hyphen
-                string leftCharacterIcon =
-                line8SplitAtAngleHyphen[0].Substring(line8SplitAtAngleHyphen[0].Length - 2); //Grab two characters before hyphen (angle and space)
-                string rightCharacterIcon =
-                line8SplitAtAngleHyphen[1].Substring(0, 2); //Grab two characters after hypen (space and right angle)
-                leftCharacterIcon = leftCharacterIcon.Trim(); //Remove space
-                rightCharacterIcon = rightCharacterIcon.Trim(); //Remove Space
-                //Find angle from symbol//
-                string leftSawAngle = findSawAngle(leftCharacterIcon);
-                string rightSawAngle = findSawAngle(rightCharacterIcon);
-                leftHead = $"{leftSawAngle}|{rightSawAngle}";
-                rightHead = leftHead;
-                printToLog($"Left Head: {leftCharacterIcon}-{rightCharacterIcon} -> {leftHead}");
-                printToLog($"Right Head: {leftCharacterIcon}-{rightCharacterIcon} -> {rightHead}");
-                //------------------------------//
+                //Check that saw angle exists otherwise will outofbounds// V1.0 TESTS ADDON
+                bool angleExists = false;
+                angleExists = contentsOfPrt[7].Contains("-");
+                //---------------------------------------------------------
+                if (angleExists)
+                {
+                    var line8SplitAtAngleHyphen = contentsOfPrt[7].Split('-'); //split by hyphen
+                    string leftCharacterIcon =
+                    line8SplitAtAngleHyphen[0].Substring(line8SplitAtAngleHyphen[0].Length - 2); //Grab two characters before hyphen (angle and space)
+                    string rightCharacterIcon =
+                    line8SplitAtAngleHyphen[1].Substring(0, 2); //Grab two characters after hypen (space and right angle)
+                    leftCharacterIcon = leftCharacterIcon.Trim(); //Remove space
+                    rightCharacterIcon = rightCharacterIcon.Trim(); //Remove Space
+                                                                    //Find angle from symbol//
+                    string leftSawAngle = findSawAngle(leftCharacterIcon);
+                    string rightSawAngle = findSawAngle(rightCharacterIcon);
+                    leftHead = $"{leftSawAngle}|{rightSawAngle}";
+                    rightHead = leftHead;
+                    printToLog($"Left Head: {leftCharacterIcon}-{rightCharacterIcon} -> {leftHead}");
+                    printToLog($"Right Head: {leftCharacterIcon}-{rightCharacterIcon} -> {rightHead}");
+                    //------------------------------//
 
-                //Print Constants:
-                printToLog($"Amount: {amount}");
-                printToLog($"Height: {height}");
+                    //Print Constants:
+                    printToLog($"Amount: {amount}");
+                    printToLog($"Height: {height}");
+                }
+                else
+                {
+                    leftHead = "90";
+                    rightHead = "90";
+                }
 
-
-                //------------PART 5------------//
-                //--------Get Job Number--------// 
-                var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
+                    //------------PART 5------------//
+                    //--------Get Job Number--------// 
+                    var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
                 var prtLine5SplitMoreAtFs = prtLine5SplitAtNo[1].Split("^FS"); //further split between ^FS at end
                 orderNumber = prtLine5SplitMoreAtFs[0]; //Just before ^FS is job number
                 if (orderNumber == "") //If this is blank, print that there is none
@@ -732,6 +757,17 @@ namespace TT425_Lotus_Monorail
                 printToLog($"Dealer: {dealer}");
                 //----------------------------------//
 
+
+                //xxxxxxxx BAY CILL ERRORING XXXXXXXX//
+                if (bayCillDetected)
+                {
+                        profileCode = "SKIPPEDFILE";
+                        orderNumber = "BAYCILL";
+                        dealer = "DO-NOT-CUT";
+                        cuttingLength = "0.0";
+                }
+
+
                 //SIZE CHECKS/COMPRESSIONS//
                 printToLog($"Checking sizes...");
                 cuttingNoAsString = isThisTooBig(cuttingNoAsString, 4, "Cutting Number");
@@ -753,6 +789,7 @@ namespace TT425_Lotus_Monorail
                 //Compile all information into one string line with ; seperating the values
                 detailsAsOneLine = ($"{cuttingNoAsString};{cuttingLength};{profileCode};{leftHead};{rightHead};{height};{orderNumber};{poz};{assembly}" +
                                         $";;;;;;{dealer}");
+
                 string nameOfFile2Write = fileName;
                 nameOfFile2Write = nameOfFile2Write.Substring(0, nameOfFile2Write.Length - 4);
 
@@ -760,12 +797,12 @@ namespace TT425_Lotus_Monorail
                 //---------------------------------//  
                 printToLog($"File is one part of a multi .prt batch");
                 //append to start 2congealB
-                nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
-                printToLog($"Generated temporary file {nameOfFile2Write}");
+                    nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
+                    printToLog($"Generated temporary file {nameOfFile2Write}");
 
-                string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
-                File.WriteAllText(fullWritePath, detailsAsOneLine);
-
+                    string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
+                    File.WriteAllText(fullWritePath, detailsAsOneLine);
+                
 
 
             } //End of loop that checks if file exists (safety loop)
@@ -899,8 +936,25 @@ namespace TT425_Lotus_Monorail
                     File.Delete(file2Delete);
                 }
             }
+            obliterate(".prt");
+            obliterate(".csv");
+           
+
         }
 
+        private void obliterate(string filetype)
+        {
+            printToLog($"Obliterating {filetype} files in {folderLocationBox.Text}");
+            string folderToObliterate = folderLocationBox.Text;
+            string[] explodeTheseGuys = Directory.GetFiles(folderToObliterate, $"*{filetype}", SearchOption.TopDirectoryOnly); //create array of all files 2 be deleted
+            foreach (string file2Delete in explodeTheseGuys)
+            {
+                if (File.Exists(file2Delete))
+                {
+                    File.Delete(file2Delete);
+                }
+            }
+        }
         //NOTES:
         /*
          * When files are converted and written to the USB, make sure you run every method for checking folder and USB to rescan all values. 

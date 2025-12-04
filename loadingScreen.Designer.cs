@@ -36,12 +36,12 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.converting1;
-            ClientSize = new Size(292, 23);
+            ClientSize = new Size(292, 96);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Location = new Point(43, 124);
-            MaximumSize = new Size(298, 47);
-            MinimumSize = new Size(298, 47);
+            MaximumSize = new Size(298, 120);
+            MinimumSize = new Size(298, 120);
             Name = "loadingScreen";
             StartPosition = FormStartPosition.Manual;
             Text = "Please wait!";
