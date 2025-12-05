@@ -44,11 +44,14 @@
             pictureBox1 = new PictureBox();
             exitToolStripMenuItem = new ToolStripMenuItem();
             convertFilesTT425ToolStripMenuItem = new ToolStripMenuItem();
-            menuStrip1 = new MenuStrip();
             convertToTT425ToolStripMenuItem = new ToolStripMenuItem();
             refreshUSBToolStripMenuItem = new ToolStripMenuItem();
             clearLogToolStripMenuItem = new ToolStripMenuItem();
+            menuStrip1 = new MenuStrip();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
+            patchNotesToolStripMenuItem = new ToolStripMenuItem();
+            autoClearBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
@@ -71,7 +74,7 @@
             folderLocationBox.BorderStyle = BorderStyle.FixedSingle;
             folderLocationBox.Cursor = Cursors.Hand;
             folderLocationBox.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            folderLocationBox.Location = new Point(10, 50);
+            folderLocationBox.Location = new Point(10, 56);
             folderLocationBox.Margin = new Padding(9, 6, 9, 6);
             folderLocationBox.MaximumSize = new Size(378, 26);
             folderLocationBox.Name = "folderLocationBox";
@@ -88,7 +91,7 @@
             logBox.BorderStyle = BorderStyle.FixedSingle;
             logBox.Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             logBox.ForeColor = Color.MintCream;
-            logBox.Location = new Point(10, 242);
+            logBox.Location = new Point(10, 248);
             logBox.MaximumSize = new Size(378, 109);
             logBox.MinimumSize = new Size(378, 109);
             logBox.Name = "logBox";
@@ -104,7 +107,7 @@
             removableDrivesSelection.DropDownStyle = ComboBoxStyle.DropDownList;
             removableDrivesSelection.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             removableDrivesSelection.FormattingEnabled = true;
-            removableDrivesSelection.Location = new Point(10, 116);
+            removableDrivesSelection.Location = new Point(10, 122);
             removableDrivesSelection.MaximumSize = new Size(378, 0);
             removableDrivesSelection.MinimumSize = new Size(378, 0);
             removableDrivesSelection.Name = "removableDrivesSelection";
@@ -116,7 +119,7 @@
             // 
             statusLight.Anchor = AnchorStyles.None;
             statusLight.Image = Properties.Resources.FileCheckNG;
-            statusLight.Location = new Point(10, 84);
+            statusLight.Location = new Point(10, 90);
             statusLight.Name = "statusLight";
             statusLight.Size = new Size(26, 26);
             statusLight.TabIndex = 6;
@@ -129,7 +132,7 @@
             fileCheckerStatusText.BorderStyle = BorderStyle.FixedSingle;
             fileCheckerStatusText.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileCheckerStatusText.ForeColor = Color.White;
-            fileCheckerStatusText.Location = new Point(42, 84);
+            fileCheckerStatusText.Location = new Point(42, 90);
             fileCheckerStatusText.Multiline = false;
             fileCheckerStatusText.Name = "fileCheckerStatusText";
             fileCheckerStatusText.ReadOnly = true;
@@ -143,7 +146,7 @@
             // 
             USBCheckLight.Anchor = AnchorStyles.None;
             USBCheckLight.Image = Properties.Resources.FileCheckNG;
-            USBCheckLight.Location = new Point(10, 150);
+            USBCheckLight.Location = new Point(10, 156);
             USBCheckLight.Name = "USBCheckLight";
             USBCheckLight.Size = new Size(26, 26);
             USBCheckLight.TabIndex = 8;
@@ -156,7 +159,7 @@
             USBStatusText.BorderStyle = BorderStyle.FixedSingle;
             USBStatusText.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             USBStatusText.ForeColor = Color.White;
-            USBStatusText.Location = new Point(42, 150);
+            USBStatusText.Location = new Point(42, 156);
             USBStatusText.Multiline = false;
             USBStatusText.Name = "USBStatusText";
             USBStatusText.ReadOnly = true;
@@ -170,7 +173,7 @@
             // 
             RefreshButton.Anchor = AnchorStyles.None;
             RefreshButton.Image = Properties.Resources.RefreshUsbIcon;
-            RefreshButton.Location = new Point(350, 146);
+            RefreshButton.Location = new Point(350, 152);
             RefreshButton.Name = "RefreshButton";
             RefreshButton.Size = new Size(39, 30);
             RefreshButton.TabIndex = 10;
@@ -183,7 +186,7 @@
             // 
             changeFolderIcon.Anchor = AnchorStyles.None;
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIcon;
-            changeFolderIcon.Location = new Point(10, 29);
+            changeFolderIcon.Location = new Point(10, 35);
             changeFolderIcon.Name = "changeFolderIcon";
             changeFolderIcon.Size = new Size(25, 20);
             changeFolderIcon.TabIndex = 11;
@@ -196,7 +199,7 @@
             // 
             PowerButton.Anchor = AnchorStyles.None;
             PowerButton.Image = Properties.Resources.PowerIdle;
-            PowerButton.Location = new Point(365, 214);
+            PowerButton.Location = new Point(365, 220);
             PowerButton.Name = "PowerButton";
             PowerButton.Size = new Size(24, 24);
             PowerButton.TabIndex = 12;
@@ -211,7 +214,7 @@
             GoLabel.AutoSize = true;
             GoLabel.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             GoLabel.ForeColor = SystemColors.ActiveCaptionText;
-            GoLabel.Location = new Point(216, 219);
+            GoLabel.Location = new Point(216, 225);
             GoLabel.Name = "GoLabel";
             GoLabel.Size = new Size(143, 16);
             GoLabel.TabIndex = 13;
@@ -222,7 +225,7 @@
             // 
             pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.tamao;
-            pictureBox1.Location = new Point(10, 182);
+            pictureBox1.Location = new Point(10, 188);
             pictureBox1.MaximumSize = new Size(171, 60);
             pictureBox1.MinimumSize = new Size(171, 60);
             pictureBox1.Name = "pictureBox1";
@@ -234,8 +237,8 @@
             // 
             exitToolStripMenuItem.ForeColor = Color.White;
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(51, 20);
-            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Size = new Size(27, 20);
+            exitToolStripMenuItem.Text = "X";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // convertFilesTT425ToolStripMenuItem
@@ -245,22 +248,6 @@
             convertFilesTT425ToolStripMenuItem.Name = "convertFilesTT425ToolStripMenuItem";
             convertFilesTT425ToolStripMenuItem.Size = new Size(51, 20);
             convertFilesTT425ToolStripMenuItem.Text = "File";
-            // 
-            // menuStrip1
-            // 
-            menuStrip1.BackgroundImage = Properties.Resources.bg006;
-            menuStrip1.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { exitToolStripMenuItem, convertFilesTT425ToolStripMenuItem, helpToolStripMenuItem });
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.RightToLeft = RightToLeft.Yes;
-            menuStrip1.Size = new Size(398, 24);
-            menuStrip1.TabIndex = 15;
-            menuStrip1.Text = "menuStrip1";
-            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
-            menuStrip1.MouseDown += menuStrip1_MouseDown;
-            menuStrip1.MouseMove += menuStrip1_MouseMove;
-            menuStrip1.MouseUp += menuStrip1_MouseUp;
             // 
             // convertToTT425ToolStripMenuItem
             // 
@@ -283,19 +270,69 @@
             clearLogToolStripMenuItem.Text = "Clear Log";
             clearLogToolStripMenuItem.Click += clearLogToolStripMenuItem_Click;
             // 
+            // menuStrip1
+            // 
+            menuStrip1.BackgroundImage = Properties.Resources.bg006;
+            menuStrip1.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { exitToolStripMenuItem, toolStripMenuItem1, convertFilesTT425ToolStripMenuItem, helpToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.RightToLeft = RightToLeft.Yes;
+            menuStrip1.Size = new Size(398, 24);
+            menuStrip1.TabIndex = 15;
+            menuStrip1.Text = "menuStrip1";
+            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
+            menuStrip1.MouseDown += menuStrip1_MouseDown;
+            menuStrip1.MouseMove += menuStrip1_MouseMove;
+            menuStrip1.MouseUp += menuStrip1_MouseUp;
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.BackColor = Color.Transparent;
+            toolStripMenuItem1.ForeColor = Color.White;
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(43, 20);
+            toolStripMenuItem1.Text = "[-]";
+            toolStripMenuItem1.Click += toolStripMenuItem1_Click;
+            // 
             // helpToolStripMenuItem
             // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { patchNotesToolStripMenuItem });
             helpToolStripMenuItem.ForeColor = Color.White;
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(51, 20);
             helpToolStripMenuItem.Text = "Help";
+            helpToolStripMenuItem.Click += helpToolStripMenuItem_Click;
+            // 
+            // patchNotesToolStripMenuItem
+            // 
+            patchNotesToolStripMenuItem.Name = "patchNotesToolStripMenuItem";
+            patchNotesToolStripMenuItem.Size = new Size(162, 22);
+            patchNotesToolStripMenuItem.Text = "Patch Notes";
+            patchNotesToolStripMenuItem.Click += patchNotesToolStripMenuItem_Click;
+            // 
+            // autoClearBox
+            // 
+            autoClearBox.AutoSize = true;
+            autoClearBox.Checked = true;
+            autoClearBox.CheckState = CheckState.Checked;
+            autoClearBox.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            autoClearBox.ForeColor = Color.Black;
+            autoClearBox.Location = new Point(10, 363);
+            autoClearBox.Name = "autoClearBox";
+            autoClearBox.Size = new Size(186, 20);
+            autoClearBox.TabIndex = 16;
+            autoClearBox.Text = "Clear original files";
+            autoClearBox.UseVisualStyleBackColor = true;
+            autoClearBox.CheckedChanged += autoClearBox_CheckedChanged;
             // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Lavender;
-            ClientSize = new Size(398, 363);
+            ClientSize = new Size(398, 465);
+            Controls.Add(autoClearBox);
             Controls.Add(pictureBox1);
             Controls.Add(GoLabel);
             Controls.Add(PowerButton);
@@ -317,6 +354,7 @@
             Name = "mainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Lotus Monorail";
+            Load += mainWindow_Load;
             Click += mainWindow_Click;
             MouseDown += mainWindow_MouseDown;
             MouseMove += mainWindow_MouseMove;
@@ -356,5 +394,8 @@
         private ToolStripMenuItem clearLogToolStripMenuItem;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem helpToolStripMenuItem;
+        private ToolStripMenuItem patchNotesToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private CheckBox autoClearBox;
     }
 }

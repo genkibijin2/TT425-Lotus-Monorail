@@ -11,7 +11,8 @@ namespace TT425_Lotus_Monorail
     {
         /*===GLOBAL VARIABLES===*/
         //####
-        String defaultDirectory = @"C:\sawfiles_two"; //default directory for .prt files, change to C:\sawfiles_two when live
+        string defaultDirectory = @"C:\sawfiles_two"; //default directory for .prt files, change to C:\sawfiles_two when live
+        string versionNumber = "V1.0.5"; //Current version of program
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
@@ -31,6 +32,13 @@ namespace TT425_Lotus_Monorail
         Boolean startupFolderCheck = true; //Starts true, turns false to indicate startup has ended and default folder should not be used
         //#
 
+        /*===DEFAULT USER SETTINGS, CHANGED ONLY VIA LOTUSSETTINGS.CONF===*/
+        //#####
+        bool automaticallyClearOriginalFolder = true; //Should the program delete original .prt files after conversion
+        string startFolder = @"C:\sawfiles_two";
+        string theme = "Default";
+        //#####
+
 
         public mainWindow()
         //###
@@ -43,6 +51,21 @@ namespace TT425_Lotus_Monorail
             printToLog("loaded!");
             folderLocationBox.Text = defaultDirectory;
             folderSelector.SelectedPath = defaultDirectory;
+
+            //Load settings
+            printToLog($"Starting in {Application.StartupPath}");
+            string exeLocationPath = Application.StartupPath;
+            bool settingsAlreadyExist = checkForSettings(exeLocationPath);
+            if (settingsAlreadyExist)
+            {
+                printToLog("Found LotusSettings.conf");
+                loadLotusSettings($"{exeLocationPath}SaveData\\LotusSettings.conf");
+            }
+            else
+            {
+                printToLog("No LotusSettings.conf found, creating save data...");
+                createLotusSettings(exeLocationPath);
+            }
 
             //Drive Check
             removableDrivesSelection.Items.Add("No USB Drives Found");
@@ -58,10 +81,86 @@ namespace TT425_Lotus_Monorail
                 checkForPRTFiles(defaultDirectory); //Check default directory for PRT Files
                 CheckUSBProcess();
             }
+
+            printToLog($"Program version: {versionNumber}");
             startupFolderCheck = false;
 
         }
         //###
+
+        //Settings Loader//
+        private bool checkForSettings(string exeLocationPath)
+        {
+            printToLog($"Looking for LotusSettings.conf...");
+            string fullPathToSettings = $"{exeLocationPath}SaveData\\LotusSettings.conf";
+            return System.IO.File.Exists(fullPathToSettings);
+        }
+        //Create save data method
+        private void createLotusSettings(string exeLocationPath)
+        {
+            string settingsFile = $"{exeLocationPath}SaveData\\LotusSettings.conf";
+            string defaultSettingsTemplate = getDefaultSettings();
+            try
+            {
+                System.IO.Directory.CreateDirectory($"{exeLocationPath}SaveData");
+                File.WriteAllText(settingsFile, defaultSettingsTemplate);
+            }
+            catch (Exception ex)
+            {
+                printToLog($"Error creating save data: {ex}");
+            }
+        }
+        private void loadLotusSettings(string settingsFile)
+        {
+            //Load Option 1, automatically clear original folder or not.
+            string[] contentsOfSettings = File.ReadAllLines(settingsFile);
+            string[] autoClearSettingLines = contentsOfSettings[1].Split(":");
+            string autoclearSetting = autoClearSettingLines[1];
+            if (autoclearSetting == "YES") { automaticallyClearOriginalFolder = true; }
+            else if (autoclearSetting == "NO") { automaticallyClearOriginalFolder = false; }
+            else { printToLog($"Cannot parse auto clear setting...defaulting to on"); automaticallyClearOriginalFolder = false; }
+
+            //Load Option 2, start folder.
+            string[] startFolderSettingLines = contentsOfSettings[2].Split("Folder:");
+            string startFolderSetting = startFolderSettingLines[1];
+            defaultDirectory = startFolderSetting;
+
+            //Load Option 3, Theme
+            string[] themeSettingLines = contentsOfSettings[3].Split(":");
+            string themeSetting = themeSettingLines[1];
+            theme = themeSetting;
+        }
+
+        private void saveSettings(string settingsFile)
+        {
+            printToLog("Updating settings.conf");
+            try
+            {
+                string finalOutput = ($"~Settings File~{Environment.NewLine}");
+                //set automatic clear setting
+                if (automaticallyClearOriginalFolder)
+                {
+                    finalOutput = (finalOutput + $"automaticallyClearOriginalFolder:YES{Environment.NewLine}");
+                }
+                else
+                {
+                    finalOutput = (finalOutput + $"automaticallyClearOriginalFolder:NO{Environment.NewLine}");
+                }
+                //set startfolder
+                finalOutput = finalOutput + $"StartFolder:{defaultDirectory}{Environment.NewLine}";
+
+                //set Theme
+                finalOutput = finalOutput + $"Theme:{theme}";
+                File.WriteAllText(settingsFile, finalOutput);
+                printToLog("Saved...");
+
+            }
+            catch (Exception ex)
+            {
+                printToLog($"{ex}");
+                printToLog($"Error saving settings...");
+            }
+        }
 
         //Folder Picker Methods//
         private void locationBoxClick(object sender, MouseEventArgs e)
@@ -566,8 +665,15 @@ namespace TT425_Lotus_Monorail
 
 
             //End of Write
+            if (automaticallyClearOriginalFolder)
+            {
+                fileCheckerStatusText.Text = $"Original Files cleared";
+                USBStatusText.Text = $"Files converted to USB";
+                statusLight.Image = Properties.Resources.FileCheckSync;
+                USBCheckLight.Image = Properties.Resources.FileCheckSync;
+            }
+            powerReady = false;
             PowerButton.Image = Properties.Resources.PowerIdle;
-            CheckUSBProcess();
         }
         private bool secondFileMultiCheck(string currentFile, string nextFileInArray)
         /*This has ended up a little bit complicated, spaghetti and insane, but the idea here was to check if there were other files on the USB already
@@ -629,7 +735,8 @@ namespace TT425_Lotus_Monorail
             string height = "60"; //Can query db to find out, but just leave at 70 for most part
             string orderNumber = "J0024569"; //Taken from Job No, after No: and before ^FS (do a double split)
             string poz = "1"; //Not sure if matters, leave at 1.
-            string assembly = ($"{fileNumber + 1}"); //same as cuttingNo, changes with file, but shouldnt matter too much.
+            //string assembly = ($"{fileNumber + 1}"); //same as cuttingNo, changes with file, but shouldnt matter too much.
+            string assembly = "1";
             //Ignore Trolley, Box axis, Gasket, Operation//
             string dealer = "1234567"; //Barcode
 
@@ -660,13 +767,13 @@ namespace TT425_Lotus_Monorail
                 {
                     cuttingLength = "0"; //If cutting length is missing, hence the angle would be loaded instead
                 }
-                if (cuttingLength.Substring(cuttingLength.Length-1, 1) == ",")
+                if (cuttingLength.Substring(cuttingLength.Length - 1, 1) == ",")
                 {
                     printToLog($"{pathOfPCFile} has multiple angles and may be a bay cill. This line will be written blank!");
                     MessageBox.Show($"{pathOfPCFile} has multiple angles and may be a bay cill. This line will be written blank!");
                     bayCillDetected = true;
                 }
-                
+
 
                 cuttingLength = cuttingLength.Substring(0, cuttingLength.Length - 1); //remove letter at the end
                 //Add .0 decimal if no decimal found
@@ -726,13 +833,13 @@ namespace TT425_Lotus_Monorail
                 }
                 else
                 {
-                    leftHead = "90";
-                    rightHead = "90";
+                    leftHead = "90|90";
+                    rightHead = "90|90";
                 }
 
-                    //------------PART 5------------//
-                    //--------Get Job Number--------// 
-                    var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
+                //------------PART 5------------//
+                //--------Get Job Number--------// 
+                var prtLine5SplitAtNo = contentsOfPrt[4].Split("No:"); //split between 'no:'
                 var prtLine5SplitMoreAtFs = prtLine5SplitAtNo[1].Split("^FS"); //further split between ^FS at end
                 orderNumber = prtLine5SplitMoreAtFs[0]; //Just before ^FS is job number
                 if (orderNumber == "") //If this is blank, print that there is none
@@ -761,10 +868,10 @@ namespace TT425_Lotus_Monorail
                 //xxxxxxxx BAY CILL ERRORING XXXXXXXX//
                 if (bayCillDetected)
                 {
-                        profileCode = "SKIPPEDFILE";
-                        orderNumber = "BAYCILL";
-                        dealer = "DO-NOT-CUT";
-                        cuttingLength = "0.0";
+                    profileCode = "SKIPPEDFILE";
+                    orderNumber = "BAYCILL";
+                    dealer = "DO-NOT-CUT";
+                    cuttingLength = "0.0";
                 }
 
 
@@ -777,6 +884,7 @@ namespace TT425_Lotus_Monorail
                 rightHead = isThisTooBig(rightHead, 5, "Right Head");
                 height = isThisTooBig(height, 3, "Height");
                 orderNumber = isThisTooBig(orderNumber, 10, "Order Number");
+                orderNumber = String.Concat(orderNumber.Where(c => !Char.IsWhiteSpace(c)));
                 poz = isThisTooBig(poz, 3, "Position");
                 assembly = isThisTooBig(assembly, 1, "Assembly");
                 dealer = isThisTooBig(dealer, 21, "Dealer/Barcode");
@@ -787,7 +895,7 @@ namespace TT425_Lotus_Monorail
                 //-----------PART 7----------------//
                 //--------Writing to csv-----------//
                 //Compile all information into one string line with ; seperating the values
-                detailsAsOneLine = ($"{cuttingNoAsString};{cuttingLength};{profileCode};{leftHead};{rightHead};{height};{orderNumber};{poz};{assembly}" +
+                detailsAsOneLine = ($"{cuttingNoAsString};{cuttingLength};{profileCode};{leftHead};{rightHead};{amount};{height};{orderNumber};{poz};{assembly}" +
                                         $";;;;;;{dealer}");
 
                 string nameOfFile2Write = fileName;
@@ -797,12 +905,12 @@ namespace TT425_Lotus_Monorail
                 //---------------------------------//  
                 printToLog($"File is one part of a multi .prt batch");
                 //append to start 2congealB
-                    nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
-                    printToLog($"Generated temporary file {nameOfFile2Write}");
+                nameOfFile2Write = ($"2congealB{nameOfFile2Write}.csv");
+                printToLog($"Generated temporary file {nameOfFile2Write}");
 
-                    string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
-                    File.WriteAllText(fullWritePath, detailsAsOneLine);
-                
+                string fullWritePath = $"{currentSelectedUSBDrive}{nameOfFile2Write}";
+                File.WriteAllText(fullWritePath, detailsAsOneLine);
+
 
 
             } //End of loop that checks if file exists (safety loop)
@@ -936,10 +1044,13 @@ namespace TT425_Lotus_Monorail
                     File.Delete(file2Delete);
                 }
             }
-            obliterate(".prt");
-            obliterate(".csv");
-           
 
+            //If automatically check is enabled...
+            if (automaticallyClearOriginalFolder)
+            {
+                obliterate(".prt");
+                obliterate(".csv");
+            }
         }
 
         private void obliterate(string filetype)
@@ -970,6 +1081,8 @@ namespace TT425_Lotus_Monorail
          * !! Network writing over ethernet
          * !! Daemon-like functionality, click run and it will automatically keep moving files from the location to target area
          * !! UI redesign
+         * !! Changelog accessible document
+         * !! 
          */
 
         /*
@@ -1056,17 +1169,17 @@ namespace TT425_Lotus_Monorail
 
         private void menuStrip1_MouseDown(object sender, MouseEventArgs e)
         {
-           
+
         }
 
         private void menuStrip1_MouseMove(object sender, MouseEventArgs e)
         {
-           
+
         }
 
         private void menuStrip1_MouseUp(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -1074,7 +1187,46 @@ namespace TT425_Lotus_Monorail
 
         }
 
-      
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            printToLog("This feature is not available yet, sorry!");
+            //HelpLaunch();
+        }
+
+        private void patchNotesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            printToLog("This feature is not available yet, sorry!");
+            //PatchNotesLaunch();
+        }
+
+        //### Default Settings Template
+        private string getDefaultSettings()
+        {
+            string defaultSettingsString =
+                ($"~Settings File~{Environment.NewLine}" +
+                $"automaticallyClearOriginalFolder:YES{Environment.NewLine}" +
+                "StartFolder:" + @"C:\\sawfiles_two" + $"{Environment.NewLine}" +
+                $"Theme:Default{Environment.NewLine}");
+            return defaultSettingsString;
+        }
+
+        private void mainWindow_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e) //minimize button
+        {
+            this.WindowState = FormWindowState.Minimized;
+
+        }
+
+        private void autoClearBox_CheckedChanged(object sender, EventArgs e)
+        {
+            automaticallyClearOriginalFolder = autoClearBox.Checked;
+            saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
+        }
+
         //--------------------------------------------------------------------------------------------//
     }
 }
