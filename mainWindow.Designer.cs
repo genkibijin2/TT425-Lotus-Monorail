@@ -52,6 +52,7 @@
             helpToolStripMenuItem = new ToolStripMenuItem();
             patchNotesToolStripMenuItem = new ToolStripMenuItem();
             autoClearBox = new CheckBox();
+            automaticCleanupCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
@@ -307,7 +308,7 @@
             // patchNotesToolStripMenuItem
             // 
             patchNotesToolStripMenuItem.Name = "patchNotesToolStripMenuItem";
-            patchNotesToolStripMenuItem.Size = new Size(162, 22);
+            patchNotesToolStripMenuItem.Size = new Size(180, 22);
             patchNotesToolStripMenuItem.Text = "Patch Notes";
             patchNotesToolStripMenuItem.Click += patchNotesToolStripMenuItem_Click;
             // 
@@ -326,12 +327,26 @@
             autoClearBox.UseVisualStyleBackColor = true;
             autoClearBox.CheckedChanged += autoClearBox_CheckedChanged;
             // 
+            // automaticCleanupCheckBox
+            // 
+            automaticCleanupCheckBox.AutoSize = true;
+            automaticCleanupCheckBox.Font = new Font("SimSun", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            automaticCleanupCheckBox.ForeColor = Color.Black;
+            automaticCleanupCheckBox.Location = new Point(10, 389);
+            automaticCleanupCheckBox.Name = "automaticCleanupCheckBox";
+            automaticCleanupCheckBox.Size = new Size(210, 20);
+            automaticCleanupCheckBox.TabIndex = 17;
+            automaticCleanupCheckBox.Text = "Clean junk files on USB";
+            automaticCleanupCheckBox.UseVisualStyleBackColor = true;
+            automaticCleanupCheckBox.CheckedChanged += automaticCleanupCheckBox_CheckedChanged;
+            // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Lavender;
             ClientSize = new Size(398, 465);
+            Controls.Add(automaticCleanupCheckBox);
             Controls.Add(autoClearBox);
             Controls.Add(pictureBox1);
             Controls.Add(GoLabel);
@@ -397,5 +412,6 @@
         private ToolStripMenuItem patchNotesToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem1;
         private CheckBox autoClearBox;
+        private CheckBox automaticCleanupCheckBox;
     }
 }

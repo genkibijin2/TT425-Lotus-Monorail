@@ -12,7 +12,7 @@ namespace TT425_Lotus_Monorail
         /*===GLOBAL VARIABLES===*/
         //####
         string defaultDirectory = @"C:\sawfiles_two"; //default directory for .prt files, change to C:\sawfiles_two when live
-        string versionNumber = "V1.0.5"; //Current version of program
+        string versionNumber = "V1.0.6"; //Current version of program
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
@@ -35,6 +35,7 @@ namespace TT425_Lotus_Monorail
         /*===DEFAULT USER SETTINGS, CHANGED ONLY VIA LOTUSSETTINGS.CONF===*/
         //#####
         bool automaticallyClearOriginalFolder = true; //Should the program delete original .prt files after conversion
+        bool automaticallyClearPrtFilesOnUsb = false; //Should the program clear all moved over .prt files after conversion
         string startFolder = @"C:\sawfiles_two";
         string theme = "Default";
         //#####
@@ -129,6 +130,47 @@ namespace TT425_Lotus_Monorail
             string[] themeSettingLines = contentsOfSettings[3].Split(":");
             string themeSetting = themeSettingLines[1];
             theme = themeSetting;
+
+            //load Option 4, Automatically clear leftover .prt files
+            try
+            {
+                string[] autoCleanupPrtSettingLines = contentsOfSettings[4].Split(":");
+                string autoCleanupPrtSetting = autoCleanupPrtSettingLines[1];
+                if (autoCleanupPrtSetting == "YES") { automaticallyClearPrtFilesOnUsb = true; }
+                else if (autoCleanupPrtSetting == "NO") { automaticallyClearPrtFilesOnUsb = false; }
+                else { printToLog($"Cannot parse auto cleanup .prt setting...defaulting to off"); automaticallyClearPrtFilesOnUsb = false; }
+            }
+            catch(Exception ex)
+            {
+                //When updating the software, the new setting wont be in the .conf file and will cause an out of bound exception when reading
+                //to remedy this, we just have to catch the exception and use it to write a new fresh line, then save the file.
+                printToLog($"Settings.conf is an older version!");
+                printToLog($"Upgrading settings file...");
+                automaticallyClearPrtFilesOnUsb = false;
+                saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
+                printToLog($"Settings file updated to {versionNumber}");
+            }
+            
+
+
+            //SETCHECKBOXES:
+            if (automaticallyClearOriginalFolder)
+            {
+                autoClearBox.Checked = true;
+            }
+            else
+            {
+                autoClearBox.Checked = false;
+            }
+
+            if (automaticallyClearPrtFilesOnUsb)
+            {
+                automaticCleanupCheckBox.Checked = true;
+            }
+            else
+            {
+                automaticCleanupCheckBox.Checked = false;
+            }
         }
 
         private void saveSettings(string settingsFile)
@@ -150,10 +192,22 @@ namespace TT425_Lotus_Monorail
                 finalOutput = finalOutput + $"StartFolder:{defaultDirectory}{Environment.NewLine}";
 
                 //set Theme
-                finalOutput = finalOutput + $"Theme:{theme}";
+                finalOutput = finalOutput + $"Theme:{theme}{Environment.NewLine}";
+
+
+                //set automatically clear prt files
+                if (automaticallyClearPrtFilesOnUsb)
+                {
+                    finalOutput = (finalOutput + $"automaticallyClearLeftoverPrtFiles:YES{Environment.NewLine}");
+                }
+                else
+                {
+                    finalOutput = (finalOutput + $"automaticallyClearLeftoverPrtFiles:NO{Environment.NewLine}");
+                }
+
+
                 File.WriteAllText(settingsFile, finalOutput);
                 printToLog("Saved...");
-
             }
             catch (Exception ex)
             {
@@ -1045,6 +1099,21 @@ namespace TT425_Lotus_Monorail
                 }
             }
 
+            if (automaticallyClearPrtFilesOnUsb)
+            //If automatically clear prt files is enabled.
+            {
+                printToLog($"Cleaning up .prt files on USB ");
+                string[] prtFilesOnUsbLeftOver = Directory.GetFiles(USBPATH, "*.prt", SearchOption.TopDirectoryOnly); //create array of all remaining prt files on USB
+                foreach (string file2Delete in prtFilesOnUsbLeftOver)
+                {
+                    if (File.Exists(file2Delete))
+                    {
+                        File.Delete(file2Delete);
+                    }
+                }
+            }
+
+
             //If automatically check is enabled...
             if (automaticallyClearOriginalFolder)
             {
@@ -1072,16 +1141,19 @@ namespace TT425_Lotus_Monorail
          * If everything was correct, then in theory the finished light will be the sync light as usbCheck, folder check etc will run and 
          * determine that the contents of the folder is exactly the same as the USB.
          * 
+         * 
+         * TODO RIGHT NOW:
+         * Automatically clear .prt files from the usb, leaving only .csv files
+         * button to wipe USB clean []
          */
 
         //POST-BETA UPGRADES:
         /*
          * Of course, basic USB functionality is all that's needed to push version 1, but after that I want to add many features, these include:
-         * !! Saved settings for defaults, networking location etc
-         * !! Network writing over ethernet
-         * !! Daemon-like functionality, click run and it will automatically keep moving files from the location to target area
-         * !! UI redesign
-         * !! Changelog accessible document
+         * !! Saved settings for defaults, networking location etc [/]
+         * !! Network writing over ethernet []
+         * !! Daemon-like functionality, click run and it will automatically keep moving files from the location to target area []
+         * !! Changelog accessible document []
          * !! 
          */
 
@@ -1206,7 +1278,8 @@ namespace TT425_Lotus_Monorail
                 ($"~Settings File~{Environment.NewLine}" +
                 $"automaticallyClearOriginalFolder:YES{Environment.NewLine}" +
                 "StartFolder:" + @"C:\\sawfiles_two" + $"{Environment.NewLine}" +
-                $"Theme:Default{Environment.NewLine}");
+                $"Theme:Default{Environment.NewLine}" +
+                $"automaticallyClearLeftoverPrtFiles:NO{Environment.NewLine}");
             return defaultSettingsString;
         }
 
@@ -1224,6 +1297,17 @@ namespace TT425_Lotus_Monorail
         private void autoClearBox_CheckedChanged(object sender, EventArgs e)
         {
             automaticallyClearOriginalFolder = autoClearBox.Checked;
+            saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
+        }
+
+        private void scriptsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void automaticCleanupCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            automaticallyClearPrtFilesOnUsb = automaticCleanupCheckBox.Checked;
             saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
         }
 
