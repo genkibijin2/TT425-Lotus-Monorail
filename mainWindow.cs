@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -17,6 +18,7 @@ namespace TT425_Lotus_Monorail
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
         int numberOfFiles2BeWrittenGlobal = 0; //global storage for the number of files ready to be written to usb
+        int contextHelperMaxLimit = 40; //Maximum number of characters that can be shown in the context box at the bottom of the screen
         //####
 
         /*===BOOLEANS AND ERROR CHECKERS===*/
@@ -48,7 +50,7 @@ namespace TT425_Lotus_Monorail
             //Initialization/Runtime Commands
             InitializeComponent();
             //Startup Processes
-
+            contextHelp($"Ready");
             printToLog("loaded!");
             folderLocationBox.Text = defaultDirectory;
             folderSelector.SelectedPath = defaultDirectory;
@@ -140,7 +142,7 @@ namespace TT425_Lotus_Monorail
                 else if (autoCleanupPrtSetting == "NO") { automaticallyClearPrtFilesOnUsb = false; }
                 else { printToLog($"Cannot parse auto cleanup .prt setting...defaulting to off"); automaticallyClearPrtFilesOnUsb = false; }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //When updating the software, the new setting wont be in the .conf file and will cause an out of bound exception when reading
                 //to remedy this, we just have to catch the exception and use it to write a new fresh line, then save the file.
@@ -150,7 +152,7 @@ namespace TT425_Lotus_Monorail
                 saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
                 printToLog($"Settings file updated to {versionNumber}");
             }
-            
+
 
 
             //SETCHECKBOXES:
@@ -350,7 +352,7 @@ namespace TT425_Lotus_Monorail
         //Appends log text to the top of the log box
         {
 
-
+            contextHelp(text2Print);
             DateTime currentDate = DateTime.Now;
             String justTheTime = currentDate.ToString("HH:mm:ss");
             //Check Size of log, will wipe when very very long
@@ -728,6 +730,7 @@ namespace TT425_Lotus_Monorail
             }
             powerReady = false;
             PowerButton.Image = Properties.Resources.PowerIdle;
+            printToLog($"Done!");
         }
         private bool secondFileMultiCheck(string currentFile, string nextFileInArray)
         /*This has ended up a little bit complicated, spaghetti and insane, but the idea here was to check if there were other files on the USB already
@@ -1135,6 +1138,74 @@ namespace TT425_Lotus_Monorail
                 }
             }
         }
+
+        private void helpLaunch()
+        //Opens the standard ops/help documents
+        {
+
+            bool networkConnection = false;
+            try
+            {
+                string locationOfHelpFile = @"\\EURO-DC01\ServerFolders\PC Client Installs\Kendalls Programs\Haffner TT425 Converter\HelpDocs\TT425Help.pdf";
+                printToLog($"Reading server folder...");
+                var helpLoader = new ProcessStartInfo(locationOfHelpFile)
+                {
+                    UseShellExecute = true
+                };
+                Process.Start(helpLoader);
+                printToLog($"Success! Help-file launched from server folder");
+                networkConnection = true;
+            }
+            catch (Exception error)
+            {
+                printToLog($"Could\'nt connect to Euroglaze server folders...");
+                printToLog(error.ToString());
+            }
+            if (networkConnection == false)
+            {
+                printToLog($"Searching for local copy...");
+                try
+                {
+                    string localLocation = ($"{Environment.GetFolderPath(System.Environment.SpecialFolder.Personal)}\\TT425Help.pdf");
+                    printToLog($"Searching in {localLocation}");
+                    if (File.Exists(localLocation))
+                    {
+                        var helpLoaderLocal = new ProcessStartInfo(localLocation)
+                        {
+                            UseShellExecute = true
+                        };
+                        Process.Start(helpLoaderLocal);
+                        printToLog($"Success! Help-file launched from Documents");
+                    }
+                    else
+                    {
+                        printToLog($"No local copy of the help documents found...");
+                        printToLog($"Please place 'TT425Help.pdf' in your Documents folder to load a local copy");
+                    }
+                }
+                catch (Exception error)
+                {
+                    printToLog($"Error searching for local copy: {error.ToString()}");
+                }
+            }
+        }
+
+        private void contextHelp(string helpText)
+        //changes helper box text when mouse is placed over it
+        {
+            int lengthOfText = helpText.Length;
+            string C;
+            if (lengthOfText >= 39)
+            {
+                C = helpText.Substring(0, 36);
+                C = C + @"...";
+            }
+            else
+            {
+                C = helpText;
+            }
+            ExplainBox.Text = C;
+        }
         //NOTES:
         /*
          * When files are converted and written to the USB, make sure you run every method for checking folder and USB to rescan all values. 
@@ -1143,8 +1214,9 @@ namespace TT425_Lotus_Monorail
          * 
          * 
          * TODO RIGHT NOW:
-         * Automatically clear .prt files from the usb, leaving only .csv files
-         * button to wipe USB clean []
+         * Automatically clear .prt files from the usb, leaving only .csv files [/]
+         * button to wipe USB clean [/]
+         * Format to FAT32 script? []
          */
 
         //POST-BETA UPGRADES:
@@ -1175,6 +1247,7 @@ namespace TT425_Lotus_Monorail
         //--------------------------GENERAL UI, ANIMATIONS, HOVER CHANGES ETC-------------------------//
         private void RefreshButton_MouseEnter(object sender, EventArgs e)
         {
+            contextHelp($"Refresh USBs button");
             RefreshButton.Image = Properties.Resources.RefreshUsbIconHover;
         }
         private void RefreshButton_MouseLeave(object sender, EventArgs e)
@@ -1186,6 +1259,7 @@ namespace TT425_Lotus_Monorail
         }
         private void changeFolderIcon_MouseEnter(object sender, EventArgs e)
         {
+            contextHelp($"Change .prt folder?");
             changeFolderIcon.Image = Properties.Resources.ChangeFolderIconHover;
         }
         private void changeFolderIcon_MouseLeave(object sender, EventArgs e)
@@ -1195,6 +1269,7 @@ namespace TT425_Lotus_Monorail
 
         private void PowerButton_MouseEnter(object sender, EventArgs e)
         {
+            contextHelp($"Power/GO button");
             if (powerReady)
             {
                 PowerButton.Image = Properties.Resources.PowerReadyHover;
@@ -1261,14 +1336,13 @@ namespace TT425_Lotus_Monorail
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            printToLog("This feature is not available yet, sorry!");
-            //HelpLaunch();
+
         }
 
         private void patchNotesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            printToLog("This feature is not available yet, sorry!");
-            //PatchNotesLaunch();
+            printToLog("Launching help document...");
+            helpLaunch();
         }
 
         //### Default Settings Template
@@ -1311,6 +1385,84 @@ namespace TT425_Lotus_Monorail
             saveSettings($"{Application.StartupPath}SaveData\\LotusSettings.conf");
         }
 
+
+
         //--------------------------------------------------------------------------------------------//
+
+        //###-----------------------------ContextHelperMethods-------------------------------------###//
+        /*                All of these exist to handle changing the context hover menu
+         * 
+         */
+        private void fileCheckerStatusText_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($".prt label folder info");
+        }
+
+        private void USBStatusText_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"USB Contents info");
+        }
+
+        private void logBox_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Diagnostic logs/Info box");
+        }
+
+        private void folderLocationBox_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Folder setting for this PC");
+        }
+
+        private void removableDrivesSelection_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"List of USB Drives");
+        }
+
+        private void exitToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Close the program");
+        }
+
+        private void toolStripMenuItem1_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Minimise the program");
+        }
+
+        private void autoClearBox_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp("Delete .prts after conversion?");
+        }
+
+        private void automaticCleanupCheckBox_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp("Auto delete useless USB files?");
+        }
+
+        private void convertToTT425ToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Convert/GO");
+        }
+
+        private void refreshUSBToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Refresh USB Drives");
+        }
+
+        private void clearLogToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Clear the log");
+        }
+
+        private void patchNotesToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            contextHelp($"Open the help .pdf");
+        }
+
+
+
+
+
+
+        //###--------------------------------------------------------------------------------------###//
     }
 }

@@ -53,6 +53,8 @@
             patchNotesToolStripMenuItem = new ToolStripMenuItem();
             autoClearBox = new CheckBox();
             automaticCleanupCheckBox = new CheckBox();
+            ExplainBox = new ReaLTaiizor.Controls.DungeonTextBox();
+            pictureBox2 = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
@@ -60,6 +62,7 @@
             ((System.ComponentModel.ISupportInitialize)PowerButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
             // folderSelector
@@ -84,6 +87,7 @@
             folderLocationBox.TabIndex = 1;
             folderLocationBox.Text = "C:\\Sawfiles_two";
             folderLocationBox.MouseClick += locationBoxClick;
+            folderLocationBox.MouseEnter += folderLocationBox_MouseEnter;
             // 
             // logBox
             // 
@@ -101,6 +105,7 @@
             logBox.Size = new Size(378, 109);
             logBox.TabIndex = 3;
             logBox.Text = "Loading...";
+            logBox.MouseEnter += logBox_MouseEnter;
             // 
             // removableDrivesSelection
             // 
@@ -115,6 +120,7 @@
             removableDrivesSelection.Size = new Size(378, 24);
             removableDrivesSelection.TabIndex = 4;
             removableDrivesSelection.SelectedIndexChanged += removableDrivesSelection_SelectedIndexChanged;
+            removableDrivesSelection.MouseEnter += removableDrivesSelection_MouseEnter;
             // 
             // statusLight
             // 
@@ -142,6 +148,7 @@
             fileCheckerStatusText.TabIndex = 7;
             fileCheckerStatusText.Text = "Checking folder for saw files...";
             fileCheckerStatusText.WordWrap = false;
+            fileCheckerStatusText.MouseEnter += fileCheckerStatusText_MouseEnter;
             // 
             // USBCheckLight
             // 
@@ -169,6 +176,7 @@
             USBStatusText.TabIndex = 9;
             USBStatusText.Text = "Checking USB...";
             USBStatusText.WordWrap = false;
+            USBStatusText.MouseEnter += USBStatusText_MouseEnter;
             // 
             // RefreshButton
             // 
@@ -241,6 +249,7 @@
             exitToolStripMenuItem.Size = new Size(27, 20);
             exitToolStripMenuItem.Text = "X";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            exitToolStripMenuItem.MouseEnter += exitToolStripMenuItem_MouseEnter;
             // 
             // convertFilesTT425ToolStripMenuItem
             // 
@@ -256,6 +265,7 @@
             convertToTT425ToolStripMenuItem.Size = new Size(202, 22);
             convertToTT425ToolStripMenuItem.Text = "Convert To TT425";
             convertToTT425ToolStripMenuItem.Click += convertToTT425ToolStripMenuItem_Click;
+            convertToTT425ToolStripMenuItem.MouseEnter += convertToTT425ToolStripMenuItem_MouseEnter;
             // 
             // refreshUSBToolStripMenuItem
             // 
@@ -263,6 +273,7 @@
             refreshUSBToolStripMenuItem.Size = new Size(202, 22);
             refreshUSBToolStripMenuItem.Text = "Refresh USB";
             refreshUSBToolStripMenuItem.Click += refreshUSBToolStripMenuItem_Click;
+            refreshUSBToolStripMenuItem.MouseEnter += refreshUSBToolStripMenuItem_MouseEnter;
             // 
             // clearLogToolStripMenuItem
             // 
@@ -270,6 +281,7 @@
             clearLogToolStripMenuItem.Size = new Size(202, 22);
             clearLogToolStripMenuItem.Text = "Clear Log";
             clearLogToolStripMenuItem.Click += clearLogToolStripMenuItem_Click;
+            clearLogToolStripMenuItem.MouseEnter += clearLogToolStripMenuItem_MouseEnter;
             // 
             // menuStrip1
             // 
@@ -295,6 +307,7 @@
             toolStripMenuItem1.Size = new Size(43, 20);
             toolStripMenuItem1.Text = "[-]";
             toolStripMenuItem1.Click += toolStripMenuItem1_Click;
+            toolStripMenuItem1.MouseEnter += toolStripMenuItem1_MouseEnter;
             // 
             // helpToolStripMenuItem
             // 
@@ -309,8 +322,9 @@
             // 
             patchNotesToolStripMenuItem.Name = "patchNotesToolStripMenuItem";
             patchNotesToolStripMenuItem.Size = new Size(180, 22);
-            patchNotesToolStripMenuItem.Text = "Patch Notes";
+            patchNotesToolStripMenuItem.Text = "Help PDF";
             patchNotesToolStripMenuItem.Click += patchNotesToolStripMenuItem_Click;
+            patchNotesToolStripMenuItem.MouseEnter += patchNotesToolStripMenuItem_MouseEnter;
             // 
             // autoClearBox
             // 
@@ -326,6 +340,7 @@
             autoClearBox.Text = "Clear original files";
             autoClearBox.UseVisualStyleBackColor = true;
             autoClearBox.CheckedChanged += autoClearBox_CheckedChanged;
+            autoClearBox.MouseEnter += autoClearBox_MouseEnter;
             // 
             // automaticCleanupCheckBox
             // 
@@ -339,6 +354,37 @@
             automaticCleanupCheckBox.Text = "Clean junk files on USB";
             automaticCleanupCheckBox.UseVisualStyleBackColor = true;
             automaticCleanupCheckBox.CheckedChanged += automaticCleanupCheckBox_CheckedChanged;
+            automaticCleanupCheckBox.MouseEnter += automaticCleanupCheckBox_MouseEnter;
+            // 
+            // ExplainBox
+            // 
+            ExplainBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            ExplainBox.BackColor = Color.Transparent;
+            ExplainBox.BorderColor = Color.FromArgb(180, 180, 180);
+            ExplainBox.EdgeColor = Color.White;
+            ExplainBox.Font = new Font("SimSun", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ExplainBox.ForeColor = Color.Black;
+            ExplainBox.Location = new Point(12, 425);
+            ExplainBox.MaxLength = 32767;
+            ExplainBox.Multiline = false;
+            ExplainBox.Name = "ExplainBox";
+            ExplainBox.ReadOnly = true;
+            ExplainBox.Size = new Size(332, 28);
+            ExplainBox.TabIndex = 18;
+            ExplainBox.Text = "||||||||||||||||||||||||||||||||||||||||";
+            ExplainBox.TextAlignment = HorizontalAlignment.Left;
+            ExplainBox.UseSystemPasswordChar = false;
+            // 
+            // pictureBox2
+            // 
+            pictureBox2.Image = Properties.Resources.mac3;
+            pictureBox2.Location = new Point(353, 423);
+            pictureBox2.MaximumSize = new Size(32, 32);
+            pictureBox2.MinimumSize = new Size(32, 32);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(32, 32);
+            pictureBox2.TabIndex = 19;
+            pictureBox2.TabStop = false;
             // 
             // mainWindow
             // 
@@ -346,6 +392,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Lavender;
             ClientSize = new Size(398, 465);
+            Controls.Add(pictureBox2);
+            Controls.Add(ExplainBox);
             Controls.Add(automaticCleanupCheckBox);
             Controls.Add(autoClearBox);
             Controls.Add(pictureBox1);
@@ -382,6 +430,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -413,5 +462,7 @@
         private ToolStripMenuItem toolStripMenuItem1;
         private CheckBox autoClearBox;
         private CheckBox automaticCleanupCheckBox;
+        private ReaLTaiizor.Controls.DungeonTextBox ExplainBox;
+        private PictureBox pictureBox2;
     }
 }
