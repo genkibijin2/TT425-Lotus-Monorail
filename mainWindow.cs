@@ -13,7 +13,7 @@ namespace TT425_Lotus_Monorail
         /*===GLOBAL VARIABLES===*/
         //####
         string defaultDirectory = @"C:\sawfiles_two"; //default directory for .prt files, change to C:\sawfiles_two when live
-        string versionNumber = "V1.0.6"; //Current version of program
+        string versionNumber = "V1.0.7"; //Current version of program
         string currentSelectedUSBDrive = ""; //global that holds the current USB drive letter/path, starts blank
         int currentNumberOfPrtFilesDetectedInFolder; //Global that holds the current folder selections number of PRT files.
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
@@ -1123,19 +1123,63 @@ namespace TT425_Lotus_Monorail
                 obliterate(".prt");
                 obliterate(".csv");
             }
+
+            //-------------------------PATCH UPDATE 05/02/2026--------------------------------//
+            /*  Files that are accidentally generated from the wrong song in Window Designer
+            /*  Are producing ".etk" files, which are unrelated to this software and an
+            /* indication that something has been set up wrong during conversion...
+            /* In order to patch this for now, all .etk files on the USB will be automatically
+            /* deleted, as they are not necessary at all!                                     */
+            //--------------------------------------------------------------------------------//
+            //|
+            //|
+            //v
+            obliterateUSB($".etk", USBPATH);
+            obliterateUSB($".ETK", USBPATH);
         }
 
         private void obliterate(string filetype)
         {
             printToLog($"Obliterating {filetype} files in {folderLocationBox.Text}");
             string folderToObliterate = folderLocationBox.Text;
-            string[] explodeTheseGuys = Directory.GetFiles(folderToObliterate, $"*{filetype}", SearchOption.TopDirectoryOnly); //create array of all files 2 be deleted
-            foreach (string file2Delete in explodeTheseGuys)
+            try
             {
-                if (File.Exists(file2Delete))
+                string[] explodeTheseGuys = Directory.GetFiles(folderToObliterate, $"*{filetype}", SearchOption.TopDirectoryOnly); //create array of all files 2 be deleted
+                foreach (string file2Delete in explodeTheseGuys)
                 {
-                    File.Delete(file2Delete);
+                    if (File.Exists(file2Delete))
+                    {
+                        File.Delete(file2Delete);
+                    }
                 }
+            }
+            catch(Exception files_error)
+            {
+                printToLog($"Obliteration error! {files_error}");
+            }
+        }
+
+        private void obliterateUSB(string filetype, string USBPATH)
+        {
+
+
+            printToLog($"Obliterating {filetype} files in {USBPATH}");
+            string folderToObliterate = USBPATH;
+            try
+            {
+                string[] explodeTheseGuys = Directory.GetFiles(folderToObliterate, $"*{filetype}", SearchOption.TopDirectoryOnly); //create array of all files 2 be deleted
+                foreach (string file2Delete in explodeTheseGuys)
+                {
+                    if (File.Exists(file2Delete))
+                    {
+                        printToLog($"File {file2Delete} detected!! Wiping...");
+                        File.Delete(file2Delete);
+                    }
+                }
+            }
+            catch (Exception files_error)
+            {
+                printToLog($"Obliteration error! {files_error}");
             }
         }
 
