@@ -5,7 +5,8 @@ Currently built for the hardware that is appropriate for operation of the saw, s
 Takes old .prt files that are generated when processing items through other machines in the factory, then converts them from ZPL code to a .csv that can be parsed by the TT425 in order to cut profile in the right places.
 <br/>
 <p align="center">
-<img width="398" height="465" alt="screenshot2" src="https://github.com/user-attachments/assets/00004d60-e0c3-4b24-aa84-e76ceda97a66" />
+<img width="398" height="465" alt="image" src="https://github.com/user-attachments/assets/395e6d50-4c26-4a29-bb89-1ba483f57525" />
+
 </p>
 <br/>
 
