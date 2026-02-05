@@ -19,6 +19,7 @@ namespace TT425_Lotus_Monorail
         string[] prtFilesToBeWritten = new string[10000]; //Array storing the names of files to be written
         int numberOfFiles2BeWrittenGlobal = 0; //global storage for the number of files ready to be written to usb
         int contextHelperMaxLimit = 40; //Maximum number of characters that can be shown in the context box at the bottom of the screen
+        bool debugOn = false; //debug variable for testing functions with guaranteed true value.
         //####
 
         /*===BOOLEANS AND ERROR CHECKERS===*/
@@ -1140,7 +1141,8 @@ namespace TT425_Lotus_Monorail
 
         private void obliterate(string filetype)
         {
-            printToLog($"Obliterating {filetype} files in {folderLocationBox.Text}");
+            printToLog($"Clearing {filetype} files from {folderLocationBox.Text}...");
+            
             string folderToObliterate = folderLocationBox.Text;
             try
             {
@@ -1149,9 +1151,11 @@ namespace TT425_Lotus_Monorail
                 {
                     if (File.Exists(file2Delete))
                     {
+                        
                         File.Delete(file2Delete);
                     }
                 }
+              
             }
             catch(Exception files_error)
             {
@@ -1162,7 +1166,7 @@ namespace TT425_Lotus_Monorail
         private void obliterateUSB(string filetype, string USBPATH)
         {
 
-
+            bool foundBadStuff = false;
             printToLog($"Obliterating {filetype} files in {USBPATH}");
             string folderToObliterate = USBPATH;
             try
@@ -1172,9 +1176,14 @@ namespace TT425_Lotus_Monorail
                 {
                     if (File.Exists(file2Delete))
                     {
+                        foundBadStuff = true;
                         printToLog($"File {file2Delete} detected!! Wiping...");
                         File.Delete(file2Delete);
                     }
+                }
+                if (foundBadStuff || debugOn)
+                {
+                    MessageBox.Show($"{filetype} detected! These are generated when printing to the other despatch saw in Window Designer!!", $"UH OH!!", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 }
             }
             catch (Exception files_error)
