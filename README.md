@@ -15,5 +15,5 @@ Takes old .prt files that are generated when processing items through other mach
 <b>Settings/saving options to disk[/]</b><br/>
 Networked mode (no usb required)[]<br/>
 FileWatching so so that program can run as daemon[]<br/>
-Database integration for more accurate profile data[]<br/>
+Database integration for more accurate profile data[/]<br/>
 Integrated help/updates log[]<br/>
