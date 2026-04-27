@@ -55,6 +55,7 @@
             automaticCleanupCheckBox = new CheckBox();
             ExplainBox = new ReaLTaiizor.Controls.DungeonTextBox();
             pictureBox2 = new PictureBox();
+            connectedBox = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)statusLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)USBCheckLight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RefreshButton).BeginInit();
@@ -63,6 +64,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)connectedBox).BeginInit();
             SuspendLayout();
             // 
             // folderSelector
@@ -321,7 +323,7 @@
             // patchNotesToolStripMenuItem
             // 
             patchNotesToolStripMenuItem.Name = "patchNotesToolStripMenuItem";
-            patchNotesToolStripMenuItem.Size = new Size(180, 22);
+            patchNotesToolStripMenuItem.Size = new Size(138, 22);
             patchNotesToolStripMenuItem.Text = "Help PDF";
             patchNotesToolStripMenuItem.Click += patchNotesToolStripMenuItem_Click;
             patchNotesToolStripMenuItem.MouseEnter += patchNotesToolStripMenuItem_MouseEnter;
@@ -386,12 +388,26 @@
             pictureBox2.TabIndex = 19;
             pictureBox2.TabStop = false;
             // 
+            // connectedBox
+            // 
+            connectedBox.Image = (Image)resources.GetObject("connectedBox.Image");
+            connectedBox.Location = new Point(353, 363);
+            connectedBox.MaximumSize = new Size(32, 32);
+            connectedBox.MinimumSize = new Size(32, 32);
+            connectedBox.Name = "connectedBox";
+            connectedBox.Size = new Size(32, 32);
+            connectedBox.TabIndex = 20;
+            connectedBox.TabStop = false;
+            connectedBox.Click += pictureBox3_Click;
+            connectedBox.MouseEnter += connectedBox_MouseEnter;
+            // 
             // mainWindow
             // 
             AutoScaleDimensions = new SizeF(12F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Lavender;
             ClientSize = new Size(398, 465);
+            Controls.Add(connectedBox);
             Controls.Add(pictureBox2);
             Controls.Add(ExplainBox);
             Controls.Add(automaticCleanupCheckBox);
@@ -431,6 +447,7 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)connectedBox).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -464,5 +481,6 @@
         private CheckBox automaticCleanupCheckBox;
         private ReaLTaiizor.Controls.DungeonTextBox ExplainBox;
         private PictureBox pictureBox2;
+        private PictureBox connectedBox;
     }
 }

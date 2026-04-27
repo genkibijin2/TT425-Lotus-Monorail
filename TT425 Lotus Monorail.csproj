@@ -13,6 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\napster.png" />
+    <None Remove="Images\unconnex.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Images\Lotus.ico" />
   </ItemGroup>
 
@@ -45,6 +50,11 @@
 
   <ItemGroup>
     <Folder Include="Template_Testing prt Files\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Images\napster.png" />
+    <Resource Include="Images\unconnex.png" />
   </ItemGroup>
 
 </Project>

@@ -49,7 +49,7 @@ namespace TT425_Lotus_Monorail
         //#### The format is "User ID=___;Password=___;Database=___;DataSource=___;Charset=___;
         string DBConnexionString = "blank";
         string DBConnexionPath = @"\\euro-dc01\ServerFolders\PC Client Installs\Kendalls Programs\Haffner TT425 Converter\DbDetails\DBConnexion.conf";
-       
+        bool dbConnected = false;
 
         public mainWindow()
         //###
@@ -80,10 +80,13 @@ namespace TT425_Lotus_Monorail
             //Load Database
             if (!File.Exists(DBConnexionPath))
             {
-                MessageBox.Show("DBConnexion.conf Not Found! Please place in serverfolder root... Program will still batch but database will not be written to, which could be really bad!!", "DBConnexion.conf Missing!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                dbConnected = false;
+                connectedBox.Image = Properties.Resources.unconnex;
+                MessageBox.Show("DBConnexion.conf Not Found! Please place in serverfolder/DbDetails... Program will still batch but database will not be written to, which could be really bad!!", "DBConnexion.conf Missing!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
+                dbConnected = true;
                 DBConnexionString = File.ReadAllText(DBConnexionPath);
                 printToLog("DBConnexion.conf loaded successfully.");
                 //printToLog($"Connection string is {DBConnexionString}");
@@ -1188,7 +1191,7 @@ namespace TT425_Lotus_Monorail
         private void obliterate(string filetype)
         {
             printToLog($"Clearing {filetype} files from {folderLocationBox.Text}...");
-            
+
             string folderToObliterate = folderLocationBox.Text;
             try
             {
@@ -1197,13 +1200,13 @@ namespace TT425_Lotus_Monorail
                 {
                     if (File.Exists(file2Delete))
                     {
-                        
+
                         File.Delete(file2Delete);
                     }
                 }
-              
+
             }
-            catch(Exception files_error)
+            catch (Exception files_error)
             {
                 printToLog($"Obliteration error! {files_error}");
             }
@@ -1555,6 +1558,24 @@ namespace TT425_Lotus_Monorail
         private void patchNotesToolStripMenuItem_MouseEnter(object sender, EventArgs e)
         {
             contextHelp($"Open the help .pdf");
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void connectedBox_MouseEnter(object sender, EventArgs e)
+        {
+            if (dbConnected)
+            {
+                contextHelp($"Connected to YUUBINJOB Database!");
+            }
+            else if (!dbConnected)
+            {
+                contextHelp($"Database connection failed!");
+            }
+            
         }
 
 
