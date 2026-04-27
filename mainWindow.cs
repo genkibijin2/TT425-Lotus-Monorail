@@ -1,3 +1,4 @@
+using FirebirdSql.Data.FirebirdClient;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -43,6 +44,12 @@ namespace TT425_Lotus_Monorail
         string theme = "Default";
         //#####
 
+        /*===READ CONNECTION STRING FROM DBCONNEXION.CONF (NOT AVAILABLE ON GITHUB)===*/
+        //#### Note: DBConnexion.conf is simply the connection string usually used on firebird, nothing more.
+        //#### The format is "User ID=___;Password=___;Database=___;DataSource=___;Charset=___;
+        string DBConnexionString = "blank";
+        string DBConnexionPath = @"\\euro-dc01\ServerFolders\PC Client Installs\Kendalls Programs\Haffner TT425 Converter\DbDetails\DBConnexion.conf";
+       
 
         public mainWindow()
         //###
@@ -70,6 +77,18 @@ namespace TT425_Lotus_Monorail
                 printToLog("No LotusSettings.conf found, creating save data...");
                 createLotusSettings(exeLocationPath);
             }
+            //Load Database
+            if (!File.Exists(DBConnexionPath))
+            {
+                MessageBox.Show("DBConnexion.conf Not Found! Please place in serverfolder root... Program will still batch but database will not be written to, which could be really bad!!", "DBConnexion.conf Missing!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                DBConnexionString = File.ReadAllText(DBConnexionPath);
+                printToLog("DBConnexion.conf loaded successfully.");
+                //printToLog($"Connection string is {DBConnexionString}");
+            }
+
 
             //Drive Check
             removableDrivesSelection.Items.Add("No USB Drives Found");
@@ -300,7 +319,6 @@ namespace TT425_Lotus_Monorail
             DialogResult location2StartResult = folderSelector.ShowDialog();
             if (location2StartResult == DialogResult.OK)
             {
-
                 string chosenStartFolder = folderSelector.SelectedPath;
                 folderLocationBox.Text = chosenStartFolder;
                 checkForPRTFiles(chosenStartFolder);
@@ -1082,6 +1100,34 @@ namespace TT425_Lotus_Monorail
                     File.Delete(fullWritePath);
                 }
                 File.WriteAllText(fullWritePath, fullCsvOutput);
+                //Now take justRootNumber and add to Database
+                FbConnection YUUBINCONNECT = new FbConnection(DBConnexionString);
+                try
+                {
+                    string timeRightNow = DateTime.Now.ToString("yyyy-MM-dd");
+                    YUUBINCONNECT.Open();
+                    FbTransaction YUUBINTRANSACT = YUUBINCONNECT.BeginTransaction();
+                    string SQL2Send = $"INSERT INTO YUUBINJOB (JOB_NUMBER, WHEN_ADDED, SAWBATCHED) VALUES ('{justRootNumber}', " +
+                                      $"'{timeRightNow}', '1');";
+                    FbCommand YUUBINCOMMAND = new FbCommand(SQL2Send, YUUBINCONNECT, YUUBINTRANSACT);
+                    YUUBINCOMMAND.ExecuteNonQuery();
+                    YUUBINTRANSACT.Commit();
+                    printToLog($"{justRootNumber} sent to database...");
+                    YUUBINCONNECT.Close();
+                }
+                catch (Exception ex)
+                {
+                    printToLog($"Error Adding job to YUUBINJOB Database");
+                    printToLog(ex.Message);
+                }
+                //Stock_System_Command.ExecuteNonQuery();
+                //Stock_System_Transaction.Commit();
+                /*
+                 *  SQLQuery = ("INSERT INTO YUUBINJOB" +
+                    "(JOB_NUMBER,WHEN_ADDED, SAWBATCHED)" +
+                    "VALUES ('" + job2send + 
+                    "','" + timeRightNow + "', '0');");
+                 */
 
 
 

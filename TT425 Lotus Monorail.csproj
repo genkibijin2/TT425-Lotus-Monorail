@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="DynamicLua" Version="1.1.2" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.4" />
     <PackageReference Include="FluentTransitions" Version="2.0.2" />
     <PackageReference Include="KeraLua" Version="1.4.7" />
     <PackageReference Include="Krypton.Toolkit" Version="100.25.11.328" />
